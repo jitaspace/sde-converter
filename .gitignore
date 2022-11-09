@@ -105,6 +105,7 @@ dist
 
 # downloaded stuff
 sde/
+sde.zip
 
 # IntelliJ folders
 .idea/
