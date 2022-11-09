@@ -3,7 +3,7 @@ const path = require('path');
 const YAML = require('js-yaml')
 
 // Filesystem path to the EVE SDE files
-const SDE_ROOT = "/Users/joaomlneto/Downloads/sde"
+const SDE_ROOT = "./sde"
 
 // Converts an array of objects in the format [obj1, obj2, obj3] to {[obj1.id]: obj1, [obj2.id]: obj2, [obj3.id]: obj3}
 const fromArrayOfObjectsToMap = (array, {path, idAttributeName}) => {

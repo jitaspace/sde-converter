@@ -5,5 +5,5 @@ curl https://eve-static-data-export.s3-eu-west-1.amazonaws.com/tranquility/sde.z
 
 # unzip file
 unzip sde.zip
-
+rm sde.zip
 

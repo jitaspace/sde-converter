@@ -7,7 +7,8 @@
   "author": "João Neto <joao@neto.pt>",
   "license": "MIT",
   "scripts": {
-    "convert": "node index.js"
+    "convert": "node index.js",
+    "download": "sh download.sh"
   },
   "dependencies": {
     "js-yaml": "^4.1.0",
