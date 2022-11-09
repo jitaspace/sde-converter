@@ -1,0 +1,16 @@
+{
+  "name": "sde-converter",
+  "version": "1.0.0",
+  "description": "EVE SDE Converter to JSON",
+  "main": "index.js",
+  "repository": "https://github.com/eve-graph/sde-converter.git",
+  "author": "João Neto <joao@neto.pt>",
+  "license": "MIT",
+  "scripts": {
+    "convert": "node index.js"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "yaml": "^2.1.3"
+  }
+}
