@@ -4,6 +4,8 @@ const YAML = require('js-yaml')
 
 // Filesystem path to the EVE SDE files
 const SDE_ROOT = "./sde"
+const OUTDIR = "./out"
+const BASE_URL = "https://sde.jita.space/"
 
 // Converts an array of objects in the format [obj1, obj2, obj3] to {[obj1.id]: obj1, [obj2.id]: obj2, [obj3.id]: obj3}
 const fromArrayOfObjectsToMap = (array, {path, idAttributeName}) => {
@@ -24,7 +26,7 @@ const addIdToItem = (array, {idAttributeName}) => {
     return array
 }
 
-const files = [
+const inputFiles = [
     {
         path: "bsd/invFlags.yaml",
         idAttributeName: "flagID",
@@ -149,7 +151,7 @@ const files = [
         path: "fsd/landmarks/landmarks.staticdata",
         idAttributeName: "landmarkID",
         transformations: [addIdToItem],
-        outFile: "fsd/landmarks/landmarks.json"
+        outFile: "landmarks.json"
     },
     {
         path: "fsd/marketGroups.yaml",
@@ -233,8 +235,10 @@ const files = [
     },
 ]
 
-/*
-for (const file of files) {
+/**
+ * Step 1: parse the non-universe files (at bsd and fsd root directories)
+ */
+for (const file of inputFiles) {
     console.time(file.path)
 
     // Read file
@@ -247,25 +251,30 @@ for (const file of files) {
     }
 
     // Write file
-    const outPath = path.join(SDE_ROOT, file.outFile ?? file.path.replace(".yaml", ".json"))
+    const outPath = path.join(OUTDIR, file.outFile ?? path.basename(file.path.replace(".yaml", ".json")))
     fs.writeFileSync(outPath, JSON.stringify(data))
 
     console.timeEnd(file.path)
-}*/
+}
 
+/**
+ * Step 2: parse the universe files and create consolidated metadata files
+ */
 const universeNames = fs.readdirSync(path.join(SDE_ROOT, "fsd/universe"))
 
-let regions = {}
-let constellations = {}
-let solarSystems = {}
-let planets = {}
-let moons = {}
-let asteroidBelts = {}
-let stars = {}
-let stargates = {}
+const universe = {
+    asteroidBelts: {},
+    constellations: {},
+    moons: {},
+    planets: {},
+    regions: {},
+    solarSystems: {},
+    stargates: {},
+    stars: {},
+}
 
 for (const universeName of universeNames) {
-    console.time("Universe: " + universeName)
+    console.time("fsd/universe/" + universeName)
     const universePath = path.join(SDE_ROOT, "fsd/universe", universeName)
     const regionNames = fs.readdirSync(universePath)
     //console.log(universeName, regionNames)
@@ -276,7 +285,7 @@ for (const universeName of universeNames) {
         let region = YAML.load(fs.readFileSync(path.join(regionPath, "region.staticdata"), "utf8"), 'utf8')
         region.universeID = universeName
         //console.log(region)
-        regions[region.regionID] = region
+        universe.regions[region.regionID] = region
 
         const constellationNames = fs.readdirSync(regionPath).filter(file => !file.endsWith(".staticdata"))
         for (const constellationName of constellationNames) {
@@ -285,7 +294,7 @@ for (const universeName of universeNames) {
             let constellation = YAML.load(fs.readFileSync(path.join(constellationPath, "constellation.staticdata"), "utf8"), 'utf8')
             constellation.regionID = region.regionID
 
-            constellations[constellation.constellationID] = constellation
+            universe.constellations[constellation.constellationID] = constellation
 
             const solarSystemNames = fs.readdirSync(constellationPath).filter(file => !file.endsWith(".staticdata"))
             for (const solarSystemName of solarSystemNames) {
@@ -294,58 +303,71 @@ for (const universeName of universeNames) {
                 let solarSystem = YAML.load(fs.readFileSync(path.join(solarSystemPath, "solarsystem.staticdata"), "utf8"), 'utf8')
                 solarSystem.constellationID = constellation.constellationID
 
-                solarSystems[solarSystem.solarSystemID] = solarSystem
+                universe.solarSystems[solarSystem.solarSystemID] = solarSystem
 
                 Object.keys(solarSystem.planets).forEach(planetID => {
                     const planet = solarSystem.planets[planetID]
                     planet.solarSystemID = solarSystem.solarSystemID
-                    planets[planetID] = planet
+                    universe.planets[planetID] = planet
 
                     // moons
                     Object.keys(planet.moons ?? {}).forEach(moonID => {
                         const moon = planet.moons[moonID]
                         moon.planetID = planetID
-                        moons[moonID] = moon
+                        universe.moons[moonID] = moon
                     })
                     planet.moons = Object.keys(planet.moons ?? {})
 
                     // asteroid belts
                     Object.keys(planet.asteroidBelts ?? {}).forEach(asteroidBeltID => {
-                        const asteroidBelt = planet.asteroidBelts[asteroidBeltID]
-                        asteroidBelt.planetID = planetID
-                        asteroidBelts[asteroidBeltID] = asteroidBelt
+                        universe.asteroidBelts[asteroidBeltID] = planet.asteroidBelts[asteroidBeltID]
+                        universe.asteroidBelts[asteroidBeltID].planetID = planetID
                     })
                     planet.asteroidBelts = Object.keys(planet.asteroidBelts ?? {})
                 })
                 solarSystem.planets = Object.keys(solarSystem.planets)
 
                 Object.keys(solarSystem.stargates ?? {}).forEach(stargateID => {
-                    const stargate = solarSystem.stargates[stargateID]
-                    stargate.solarSystemID = solarSystem.solarSystemID
-                    stargates[stargateID] = stargate
+                    universe.stargates[stargateID] = solarSystem.stargates[stargateID]
+                    universe.stargates[stargateID].solarSystemID = solarSystem.solarSystemID
                 })
                 solarSystem.stargates = Object.keys(solarSystem.stargates)
 
                 if (solarSystem.star) {
-                    stars[solarSystem.star.id] = solarSystem.star
+                    universe.stars[solarSystem.star.id] = solarSystem.star
                     solarSystem.star = solarSystem.star.id
                 }
 
             }
         }
     }
-    console.timeEnd("Universe: " + universeName)
+    console.timeEnd("fsd/universe/" + universeName)
 }
 
-fs.writeFileSync(path.join(SDE_ROOT, "regions.json"), JSON.stringify(regions, null, 2))
-fs.writeFileSync(path.join(SDE_ROOT, "constellations.json"), JSON.stringify(constellations, null, 2))
-fs.writeFileSync(path.join(SDE_ROOT, "solarSystems.json"), JSON.stringify(solarSystems, null, 2))
-fs.writeFileSync(path.join(SDE_ROOT, "planets.json"), JSON.stringify(planets))
-fs.writeFileSync(path.join(SDE_ROOT, "moons.json"), JSON.stringify(moons))
-fs.writeFileSync(path.join(SDE_ROOT, "stars.json"), JSON.stringify(stars, null, 2))
-fs.writeFileSync(path.join(SDE_ROOT, "stargates.json"), JSON.stringify(stargates, null, 2))
-fs.writeFileSync(path.join(SDE_ROOT, "asteroidBelts.json"), JSON.stringify(asteroidBelts, null, 2))
+Object.keys(universe).forEach(key => {
+    fs.writeFileSync(path.join(OUTDIR, key + ".json"), JSON.stringify(universe[key]))
+});
 
-console.log("#moons", Object.keys(moons).length)
+/**
+ * Step 3: Create an index file
+ */
+const outputFilenames = [
+    ...inputFiles.map(file => file.outFile ?? path.basename(file.path.replace(".yaml", ".json"))),
+    ...Object.keys(universe).map(key => key + ".json")
+]
+outputFilenames.sort()
 
-//console.log(regions)
+const index = {
+    files: outputFilenames
+        .map(name => ({
+            name,
+            size: fs.statSync(path.join(OUTDIR, name)).size,
+            mtime: fs.statSync(path.join(OUTDIR, name)).mtime,
+            url: BASE_URL + name,
+        }))
+        .reduce((obj, entry) => Object.assign(obj, {[entry.name]: entry}), {}),
+    sdeTimestamp: fs.statSync(path.join(SDE_ROOT, inputFiles[0].path)).mtime,
+    timestamp: new Date(),
+}
+
+fs.writeFileSync(path.join(OUTDIR, "index.json"), JSON.stringify(index, null, 2))

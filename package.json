@@ -7,7 +7,7 @@
   "author": "João Neto <joao@neto.pt>",
   "license": "MIT",
   "scripts": {
-    "convert": "node index.js",
+    "convert": "mkdir -p out && node index.js",
     "download": "sh download.sh"
   },
   "dependencies": {
