@@ -268,7 +268,7 @@ const extraFiles = [
  */
 for (const file of [...inputFiles, ...extraFiles]) {
     const outFilename = file.outFile ?? path.basename(file.path.replace(".yaml", ".json"))
-    console.time(outFilename)
+    console.time("generating " + outFilename)
 
     // Read file
     const filePath = path.join(SDE_ROOT, file.path)
@@ -283,7 +283,7 @@ for (const file of [...inputFiles, ...extraFiles]) {
     const outPath = path.join(OUTDIR, outFilename)
     fs.writeFileSync(outPath, JSON.stringify(data))
 
-    console.timeEnd(outFilename)
+    console.timeEnd("generating " + outFilename)
 }
 
 /**
@@ -303,7 +303,7 @@ const universe = {
 }
 
 for (const universeName of universeNames) {
-    console.time("fsd/universe/" + universeName)
+    console.time("parsing universe: " + universeName)
     const universePath = path.join(SDE_ROOT, "fsd/universe", universeName)
     const regionNames = fs.readdirSync(universePath)
     //console.log(universeName, regionNames)
@@ -370,16 +370,19 @@ for (const universeName of universeNames) {
             }
         }
     }
-    console.timeEnd("fsd/universe/" + universeName)
+    console.timeEnd("parsing universe: " + universeName)
 }
 
 Object.keys(universe).forEach(key => {
+    console.time("writing " + key + ".json")
     fs.writeFileSync(path.join(OUTDIR, key + ".json"), JSON.stringify(universe[key]))
-});
+    console.timeEnd("writing " + key + ".json")
+})
 
 /**
  * Step 3: Create an index file
  */
+console.time("generating index.json")
 const outputFilenames = [
     ...[...inputFiles, ...extraFiles].map(file => file.outFile ?? path.basename(file.path.replace(".yaml", ".json"))),
     ...Object.keys(universe).map(key => key + ".json")
@@ -400,3 +403,4 @@ const index = {
 }
 
 fs.writeFileSync(path.join(OUTDIR, "index.json"), JSON.stringify(index, null, 2))
+console.timeEnd("generating index.json")
