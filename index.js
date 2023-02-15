@@ -21,9 +21,18 @@ const fromArrayOfObjectsToMap = (array, {path, idAttributeName}) => {
 }
 
 // given a map of {key: obj, ...} returns the same map but with the key as an attribute of the object
-const addIdToItem = (array, {idAttributeName}) => {
-    Object.keys(array).forEach(id => array[id][idAttributeName] = id)
-    return array
+const addIdToItem = (obj, {idAttributeName}) => {
+    Object.keys(obj).forEach(id => obj[id][idAttributeName] = id)
+    return obj
+}
+
+const mapToProperty = (array, {attributeName}) => {
+    console.log('type', typeof array)
+    return array.map(item => item[attributeName])
+}
+
+const removeDuplicates = (array) => {
+    return [...new Set(array)]
 }
 
 const inputFiles = [
@@ -235,11 +244,31 @@ const inputFiles = [
     },
 ]
 
+const extraFiles = [
+    {
+        path: "fsd/typeIDs.yaml",
+        transformations: [(obj, {idAttributeName}) => {
+            const result = {}
+            Object.keys(obj).forEach(typeId => {
+                const variationParentTypeID = obj[typeId]["variationParentTypeID"]
+                if (variationParentTypeID) {
+                    result[typeId] = {variationParentTypeID}
+                    result[variationParentTypeID] = {variations: [...(result[variationParentTypeID]?.variations ?? []), typeId]}
+                }
+            })
+            return result;
+        }],
+        attribute: "typeID",
+        outFile: "typeVariations.json"
+    }
+]
+
 /**
  * Step 1: parse the non-universe files (at bsd and fsd root directories)
  */
-for (const file of inputFiles) {
-    console.time(file.path)
+for (const file of [...inputFiles, ...extraFiles]) {
+    const outFilename = file.outFile ?? path.basename(file.path.replace(".yaml", ".json"))
+    console.time(outFilename)
 
     // Read file
     const filePath = path.join(SDE_ROOT, file.path)
@@ -251,10 +280,10 @@ for (const file of inputFiles) {
     }
 
     // Write file
-    const outPath = path.join(OUTDIR, file.outFile ?? path.basename(file.path.replace(".yaml", ".json")))
+    const outPath = path.join(OUTDIR, outFilename)
     fs.writeFileSync(outPath, JSON.stringify(data))
 
-    console.timeEnd(file.path)
+    console.timeEnd(outFilename)
 }
 
 /**
@@ -352,7 +381,7 @@ Object.keys(universe).forEach(key => {
  * Step 3: Create an index file
  */
 const outputFilenames = [
-    ...inputFiles.map(file => file.outFile ?? path.basename(file.path.replace(".yaml", ".json"))),
+    ...[...inputFiles, ...extraFiles].map(file => file.outFile ?? path.basename(file.path.replace(".yaml", ".json"))),
     ...Object.keys(universe).map(key => key + ".json")
 ]
 outputFilenames.sort()
