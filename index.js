@@ -39,208 +39,249 @@ const inputFiles = [
     {
         path: "bsd/invFlags.yaml",
         idAttributeName: "flagID",
-        transformations: [fromArrayOfObjectsToMap]
+        transformations: [fromArrayOfObjectsToMap],
+        index: "inventory/flags"
     },
     {
         path: "bsd/invItems.yaml",
         idAttributeName: "itemID",
-        transformations: [fromArrayOfObjectsToMap]
+        transformations: [fromArrayOfObjectsToMap],
+        index: "inventory/items"
     },
     {
         path: "bsd/invNames.yaml",
         idAttributeName: "itemID",
-        transformations: [fromArrayOfObjectsToMap]
+        transformations: [fromArrayOfObjectsToMap],
+        index: "inventory/names"
     },
     {
         path: "bsd/invPositions.yaml",
         idAttributeName: "itemID",
-        transformations: [fromArrayOfObjectsToMap]
+        transformations: [fromArrayOfObjectsToMap],
+        index: "inventory/positions"
     },
     {
         path: "bsd/invUniqueNames.yaml",
         idAttributeName: "itemID",
-        transformations: [fromArrayOfObjectsToMap]
+        transformations: [fromArrayOfObjectsToMap],
+        index: "inventory/unique_names"
     },
     {
         path: "bsd/staStations.yaml",
         idAttributeName: "stationID",
-        transformations: [fromArrayOfObjectsToMap]
+        transformations: [fromArrayOfObjectsToMap],
+        index: "stations"
     },
     {
         path: "fsd/agents.yaml",
         idAttributeName: "characterID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "agents"
     },
     {
         path: "fsd/agentsInSpace.yaml",
         idAttributeName: "characterID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "agents_in_space"
     },
     {
         path: "fsd/ancestries.yaml",
         idAttributeName: "ancestryID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "ancestries"
     },
     {
         path: "fsd/bloodlines.yaml",
         idAttributeName: "bloodlineID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "bloodlines"
     },
     {
         path: "fsd/blueprints.yaml",
         idAttributeName: "blueprintTypeID",
-        transformations: []
+        transformations: [],
+        index: "blueprints"
     },
     {
         path: "fsd/categoryIDs.yaml",
         idAttributeName: "categoryID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "categories"
     },
     {
         path: "fsd/certificates.yaml",
         idAttributeName: "certificateID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "certificates"
     },
     {
         path: "fsd/characterAttributes.yaml",
         idAttributeName: "characterAttributeID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "character_attributes"
     },
     {
         path: "fsd/contrabandTypes.yaml",
         idAttributeName: "typeID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "contraband_types"
     },
     {
         path: "fsd/controlTowerResources.yaml",
         idAttributeName: "typeID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "control_tower_resources"
     },
     {
         path: "fsd/corporationActivities.yaml",
         idAttributeName: "corporationActivityID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "corporation_activities"
     },
     {
         path: "fsd/dogmaAttributeCategories.yaml",
         idAttributeName: "attributeID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "dogma/attribute_categories"
     },
     {
         path: "fsd/dogmaAttributes.yaml",
         idAttributeName: "attributeID",
-        transformations: []
+        transformations: [],
+        index: "dogma/attributes"
     },
     {
         path: "fsd/dogmaEffects.yaml",
         idAttributeName: "attributeID",
-        transformations: []
+        transformations: [],
+        index: "dogma/effects"
     },
     {
         path: "fsd/factions.yaml",
         idAttributeName: "factionID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "factions"
     },
     {
         path: "fsd/graphicIDs.yaml",
         idAttributeName: "graphicID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "graphics"
     },
     {
         path: "fsd/groupIDs.yaml",
         idAttributeName: "groupID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "groups"
     },
     {
         path: "fsd/iconIDs.yaml",
         idAttributeName: "iconID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "icons"
     },
     {
         path: "fsd/landmarks/landmarks.staticdata",
         idAttributeName: "landmarkID",
         transformations: [addIdToItem],
-        outFile: "landmarks.json"
+        outFile: "landmarks.json",
+        index: "landmarks"
     },
     {
         path: "fsd/marketGroups.yaml",
         idAttributeName: "marketGroupID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "market_groups"
     },
     {
         path: "fsd/metaGroups.yaml",
         idAttributeName: "metaGroupID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "meta_groups"
     },
     {
         path: "fsd/npcCorporationDivisions.yaml",
         idAttributeName: "npcCorporationDivisionID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "npc_corporation_divisions"
     },
     {
         path: "fsd/npcCorporations.yaml",
         idAttributeName: "corporationID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "npc_corporations"
     },
     {
         path: "fsd/planetSchematics.yaml",
         idAttributeName: "planetSchematicID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "planet_schematics"
     },
     {
         path: "fsd/races.yaml",
         idAttributeName: "raceID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "races"
     },
     {
         path: "fsd/researchAgents.yaml",
         idAttributeName: "characterID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "research_agents"
     },
     {
         path: "fsd/skinLicenses.yaml",
         idAttributeName: "licenseTypeID",
-        transformations: []
+        transformations: [],
+        index: "skin_licenses"
     },
     {
         path: "fsd/skinMaterials.yaml",
         idAttributeName: "skinMaterialID",
-        transformations: []
+        transformations: [],
+        index: "skin_materials"
     },
     {
         path: "fsd/stationOperations.yaml",
         idAttributeName: "stationOperationID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "station_operations"
     },
     {
         path: "fsd/stationServices.yaml",
         idAttributeName: "stationServiceID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "station_services"
     },
     {
         path: "fsd/tournamentRuleSets.yaml",
         idAttributeName: "ruleSetID",
-        transformations: [fromArrayOfObjectsToMap]
+        transformations: [fromArrayOfObjectsToMap],
+        index: "tournament_rule_sets"
     },
     {
         path: "fsd/translationLanguages.yaml",
         idAttributeName: "translationLanguageID",
-        transformations: []
+        transformations: [],
+        index: "translation_languages"
     },
     {
         path: "fsd/typeDogma.yaml",
         idAttributeName: "typeID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "type_dogma"
     },
     {
         path: "fsd/typeIDs.yaml",
         idAttributeName: "typeID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "types"
     },
     {
         path: "fsd/typeMaterials.yaml",
         idAttributeName: "typeID",
-        transformations: [addIdToItem]
+        transformations: [addIdToItem],
+        index: "type_materials"
     },
 ]
 
@@ -274,16 +315,35 @@ for (const file of [...inputFiles, ...extraFiles]) {
     const filePath = path.join(SDE_ROOT, file.path)
     let data = YAML.load(fs.readFileSync(filePath, "utf8"), 'utf8')
 
+    console.log("read:", Object.keys(data).slice(0, 10))
+
     // Apply transformations
     for (const transformation of file.transformations) {
         data = transformation(data, file)
     }
 
-    // Write file
+    // Write monolith file
     const outPath = path.join(OUTDIR, outFilename)
     fs.writeFileSync(outPath, JSON.stringify(data))
 
+    // Write index and individual files
+    if (file.index) {
+        const indexPath = path.join(OUTDIR, file.index)
+        // create required directories
+        if (!fs.existsSync(indexPath)) {
+            fs.mkdirSync(indexPath, {recursive: true})
+        }
+        // write index file
+        fs.writeFileSync(path.join(OUTDIR, `${file.index}.json`), JSON.stringify(Object.keys(data)))
+        // write individual entry files
+        Object.entries(data).forEach(([key, value]) => {
+            fs.writeFileSync(path.join(indexPath, `${key}.json`), JSON.stringify(value))
+        })
+    }
+
     console.timeEnd("generating " + outFilename)
+
+    process.exit();
 }
 
 /**

@@ -8,7 +8,9 @@
   "license": "MIT",
   "scripts": {
     "convert": "mkdir -p out && node index.js",
-    "download": "sh download.sh"
+    "download": "sh download.sh",
+    "rclone:sync": "rclone sync ./out sde2.jita.space:/jitaspace-sde -P",
+    "rclone:delete": "rclone delete sde2.jita.space:/jitaspace-sde -P"
   },
   "dependencies": {
     "js-yaml": "^4.1.0",
