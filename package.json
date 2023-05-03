@@ -1,19 +1,33 @@
 {
-  "name": "sde-converter",
-  "version": "1.0.0",
-  "description": "EVE SDE Converter to JSON",
-  "main": "index.js",
-  "repository": "https://github.com/eve-graph/sde-converter.git",
-  "author": "João Neto <joao@neto.pt>",
-  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=v18.16.0"
+  },
+  "packageManager": "pnpm@8.3.1",
   "scripts": {
-    "convert": "mkdir -p out && node index.js",
-    "download": "sh download.sh",
-    "rclone:sync": "rclone sync ./out sde2.jita.space:/jitaspace-sde -P",
-    "rclone:delete": "rclone delete sde2.jita.space:/jitaspace-sde -P"
+    "build": "turbo build",
+    "clean": "git clean -xdf node_modules",
+    "clean:workspaces": "turbo clean",
+    "db:generate": "turbo db:generate",
+    "db:push": "turbo db:push db:generate",
+    "dev": "turbo dev --parallel",
+    "format": "prettier --write \"**/*.{js,cjs,mjs,ts,tsx,md,json}\" --ignore-path .gitignore",
+    "lint": "turbo lint && manypkg check",
+    "lint:fix": "turbo lint:fix && manypkg fix",
+    "type-check": "turbo type-check"
   },
   "dependencies": {
-    "js-yaml": "^4.1.0",
-    "yaml": "^2.1.3"
+    "@jitaspace/eslint-config": "^0.1.0",
+    "@ianvs/prettier-plugin-sort-imports": "^3.7.2",
+    "@manypkg/cli": "^0.20.0",
+    "@types/prettier": "^2.7.2",
+    "eslint": "^8.38.0",
+    "prettier": "^2.8.8",
+    "turbo": "^1.9.3",
+    "typescript": "^5.0.4"
   }
 }

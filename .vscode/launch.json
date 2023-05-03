@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "app",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run convert",
+      "cwd": "${workspaceFolder}/apps/cli",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}
