@@ -2,8 +2,6 @@ import fs from "fs";
 import path from "path";
 import * as YAML from "js-yaml";
 
-import { addIdToItem, fromArrayOfObjectsToMap } from "./index";
-
 export type SdeInputFile = {
   // The relative path to the file, from the SDE root
   path: string;
@@ -521,6 +519,40 @@ export const sdeInputFiles: Record<string, SdeInputFile> = {
     schemaTags: ["Universe"],
   },
 };
+
+// Converts an array of objects in the format [obj1, obj2, obj3] to {[obj1.id]: obj1, [obj2.id]: obj2, [obj3.id]: obj3}
+export function fromArrayOfObjectsToMap(
+  array: Record<any, any>[],
+  { path, idAttributeName }: SdeInputFile,
+) {
+  const map: Record<any, any> = {};
+
+  array.forEach((item) => {
+    if (!item.hasOwnProperty(idAttributeName)) {
+      throw new Error(`⚠️ Missing ID ${idAttributeName} in ${path}`);
+    }
+    if (map.hasOwnProperty(item[idAttributeName])) {
+      throw new Error(
+        `⚠️ Duplicate ID ${item[idAttributeName]} found in ${path}`,
+      );
+    }
+    return (map[item[idAttributeName]] = item);
+  });
+  return map;
+}
+
+// given a map of {key: obj, ...} returns the same map but with the key as an attribute of the object
+export function addIdToItem(
+  obj: Record<any, any>,
+  { idAttributeName, idAttributeType }: SdeInputFile,
+) {
+  Object.keys(obj).forEach(
+    (id) =>
+      (obj[id][idAttributeName] =
+        idAttributeType === "number" ? parseInt(id) : id),
+  );
+  return obj;
+}
 
 export function loadFile(
   filename: keyof typeof sdeInputFiles,

@@ -1,23 +1,60 @@
-import fs from "fs";
-import * as path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import { program } from "@commander-js/extra-typings";
 import convert from "@openapi-contrib/json-schema-to-openapi-schema";
-import colors from "ansi-colors";
+import { pascalCase } from "change-case";
 import * as cliProgress from "cli-progress";
 import { js2schema } from "js2schema";
+import * as YAML from "js-yaml";
 
-import { SdeInputFile, loadFile, sdeInputFiles } from "./inputs";
+import { loadFile, sdeInputFiles } from "./inputs";
 
 program
   .description("JitaSpace SDE parser")
-  .option("-s, --sde-root <path>", "Path to the EVE SDE files", "./sde")
-  .option("-o, --out <path>", "Path to the output directory", "./out");
+  .option("-s, --sde-path <path>", "Path to the EVE SDE files", "./sde")
+  .option("-o, --out-path <path>", "Path to the output directory", "./out");
 
 program.parse();
 
-const options = program.opts() as { sdeRoot: string; out: string };
+const options = program.opts() as { sdePath: string; outPath: string };
 
-console.log(`Options: ${JSON.stringify(options, null, 2)}`);
+Object.entries(options).forEach(([key, value]) => {
+  console.log(`${key}\t: ${value}`);
+});
+
+const universe = {
+  asteroid_belts: {},
+  constellations: {},
+  moons: {},
+  planets: {},
+  regions: {},
+  solar_systems: {},
+  stargates: {},
+  stars: {},
+};
+
+const multibar = new cliProgress.MultiBar(
+  {
+    //clearOnComplete: false,
+    //format: " {bar} {percentage}% | ETA: {eta}s | {value}/{total}",
+    format: `{title} | {bar} | {value}/{total} | {duration_formatted}`,
+    clearOnComplete: true,
+    stopOnComplete: false,
+    //noTTYOutput: true,
+    //forceRedraw: true,
+    emptyOnZero: true,
+  },
+  cliProgress.Presets.rect,
+);
+
+const totalProgress = multibar.create(
+  Object.keys(sdeInputFiles).length + Object.keys(universe).length,
+  0,
+  {
+    title: "Total Progress".padEnd(30),
+  },
+);
+multibar.update();
 
 const schema = {
   openapi: "3.0.0",
@@ -48,56 +85,6 @@ const schema = {
   },
 };
 
-// Converts an array of objects in the format [obj1, obj2, obj3] to {[obj1.id]: obj1, [obj2.id]: obj2, [obj3.id]: obj3}
-export function fromArrayOfObjectsToMap(
-  array: Record<any, any>[],
-  { path, idAttributeName }: SdeInputFile,
-) {
-  const map: Record<any, any> = {};
-
-  array.forEach((item) => {
-    if (!item.hasOwnProperty(idAttributeName)) {
-      throw new Error(`⚠️ Missing ID ${idAttributeName} in ${path}`);
-    }
-    if (map.hasOwnProperty(item[idAttributeName])) {
-      throw new Error(
-        `⚠️ Duplicate ID ${item[idAttributeName]} found in ${path}`,
-      );
-    }
-    return (map[item[idAttributeName]] = item);
-  });
-  return map;
-}
-
-// given a map of {key: obj, ...} returns the same map but with the key as an attribute of the object
-export function addIdToItem(
-  obj: Record<any, any>,
-  { idAttributeName, idAttributeType }: SdeInputFile,
-) {
-  Object.keys(obj).forEach(
-    (id) =>
-      (obj[id][idAttributeName] =
-        idAttributeType === "number" ? parseInt(id) : id),
-  );
-  return obj;
-}
-
-/*
-export const mapToProperty = (
-  array: Record<any, any>,
-  { attributeName }: SdeInputFile,
-) => {
-  //console.log("type", typeof array);
-  return array.map((item) => item[attributeName]);
-};
-*/
-
-/*
-export const removeDuplicates = (array) => {
-  return [...new Set(array)];
-};
-*/
-
 export async function generateCollectionFiles(
   filename: keyof typeof sdeInputFiles,
   sdeRoot: string,
@@ -109,18 +96,15 @@ export async function generateCollectionFiles(
     throw new Error(`File ${filename} not found in sdeInputFiles`);
   }
 
-  const progress = new cliProgress.SingleBar({
-    format: `Generating ${file.outputPath} | ${colors.cyan(
-      "{bar}",
-    )} | {percentage}% || {value}/{total} Files || {duration_formatted}`,
-    barCompleteChar: "\u2588",
-    barIncompleteChar: "\u2591",
-    hideCursor: true,
+  const progress = multibar.create(0, 0, {
+    title: `Generating ${file.outputPath}`.padEnd(30),
   });
+  multibar.update();
 
   // Read file
   const data = loadFile(filename, sdeRoot);
-  progress.start(Object.keys(data).length, 0);
+  progress.setTotal(Object.keys(data).length);
+  multibar.update();
 
   // TODO transformations?
   // data = file.transformations.reduce((data, transformation) => transformation(data, file), data)
@@ -159,7 +143,10 @@ export async function generateCollectionFiles(
   if (!fs.existsSync(collectionPath)) {
     fs.mkdirSync(collectionPath, { recursive: true });
   }
-  Object.entries(data).forEach(([key, value]) => {
+  Object.entries(data).forEach(([key, value], index) => {
+    if (index % 100 === 0) {
+      multibar.update();
+    }
     progress.increment();
     fs.writeFileSync(
       path.join(collectionPath, `${key}.json`),
@@ -168,6 +155,7 @@ export async function generateCollectionFiles(
   });
 
   progress.stop();
+  multibar.update();
 
   // write schema file
   const jsonSchema = js2schema(Object.values(data), {
@@ -175,7 +163,6 @@ export async function generateCollectionFiles(
     shouldConvertNumberString: true,
     typeResolvers: {},
   });
-  //console.log(JSON.stringify(jsonSchema2, null, 2));
   const openApiSchema = await convert(jsonSchema);
 
   // @ts-expect-error
@@ -260,143 +247,282 @@ export async function generateCollectionFiles(
       },
     },
   };
+
+  multibar.remove(progress);
+  multibar.update();
 }
 
 /**
  * Step 1: parse the non-universe files (at bsd and fsd root directories)
  */
 for (const file of Object.keys(sdeInputFiles)) {
-  const outFilename = path.basename(file);
-  //console.log("Generating " + outFilename);
-  //console.time("generate " + outFilename);
-  await generateCollectionFiles(file, options.sdeRoot, options.out);
-  //console.timeEnd("generate " + outFilename);
+  await generateCollectionFiles(file, options.sdePath, options.outPath);
+  totalProgress.increment();
+  multibar.update();
 }
-
-// write the schema file
-fs.writeFileSync(
-  path.join(options.out, "latest", `swagger.json`),
-  JSON.stringify(schema, null, 2),
-);
 
 /**
  * Step 2: parse the universe files and create consolidated metadata files
  */
-/*
-const universeNames = fs.readdirSync(path.join(SDE_ROOT, "fsd/universe"))
+totalProgress.increment();
+totalProgress.update({ title: "Universe collections".padEnd(30) });
+multibar.update();
 
-const universe = {
-    asteroidBelts: {},
-    constellations: {},
-    moons: {},
-    planets: {},
-    regions: {},
-    solarSystems: {},
-    stargates: {},
-    stars: {},
-}
-
+const universeNames = fs.readdirSync(
+  path.join(options.sdePath, "fsd/universe"),
+);
 for (const universeName of universeNames) {
-    console.time("parsing universe: " + universeName)
-    const universePath = path.join(SDE_ROOT, "fsd/universe", universeName)
-    const regionNames = fs.readdirSync(universePath)
-    //console.log(universeName, regionNames)
-    for (const regionName of regionNames) {
-        //console.log('region', regionName)
-        const regionPath = path.join(universePath, regionName)
+  const universePath = path.join(options.sdePath, "fsd/universe", universeName);
+  const regionNames = fs.readdirSync(universePath);
+  const universeProgress = multibar.create(regionNames.length, 0, {
+    title: `Parsing ${universeName} regions`.padEnd(30),
+  });
+  multibar.update();
+  for (const regionName of regionNames) {
+    const regionPath = path.join(universePath, regionName);
 
-        let region = YAML.load(fs.readFileSync(path.join(regionPath, "region.staticdata"), "utf8"), 'utf8')
-        region.universeID = universeName
-        //console.log(region)
-        universe.regions[region.regionID] = region
+    let region = YAML.load(
+      fs.readFileSync(path.join(regionPath, "region.staticdata"), "utf8"),
+    );
+    // @ts-expect-error
+    region.universeID = universeName;
+    // @ts-expect-error
+    universe.regions[region.regionID] = region;
 
-        const constellationNames = fs.readdirSync(regionPath).filter(file => !file.endsWith(".staticdata"))
-        for (const constellationName of constellationNames) {
-            const constellationPath = path.join(regionPath, constellationName)
+    const constellationNames = fs
+      .readdirSync(regionPath)
+      .filter((file) => !file.endsWith(".staticdata"));
+    for (const constellationName of constellationNames) {
+      const constellationPath = path.join(regionPath, constellationName);
 
-            let constellation = YAML.load(fs.readFileSync(path.join(constellationPath, "constellation.staticdata"), "utf8"), 'utf8')
-            constellation.regionID = region.regionID
+      let constellation = YAML.load(
+        fs.readFileSync(
+          path.join(constellationPath, "constellation.staticdata"),
+          "utf8",
+        ),
+      );
+      // @ts-expect-error
+      constellation.regionID = region.regionID;
 
-            universe.constellations[constellation.constellationID] = constellation
+      // @ts-expect-error
+      universe.constellations[constellation.constellationID] = constellation;
 
-            const solarSystemNames = fs.readdirSync(constellationPath).filter(file => !file.endsWith(".staticdata"))
-            for (const solarSystemName of solarSystemNames) {
-                const solarSystemPath = path.join(constellationPath, solarSystemName)
+      const solarSystemNames = fs
+        .readdirSync(constellationPath)
+        .filter((file) => !file.endsWith(".staticdata"));
+      for (const solarSystemName of solarSystemNames) {
+        const solarSystemPath = path.join(constellationPath, solarSystemName);
 
-                let solarSystem = YAML.load(fs.readFileSync(path.join(solarSystemPath, "solarsystem.staticdata"), "utf8"), 'utf8')
-                solarSystem.constellationID = constellation.constellationID
+        let solarSystem = YAML.load(
+          fs.readFileSync(
+            path.join(solarSystemPath, "solarsystem.staticdata"),
+            "utf8",
+          ),
+        );
+        // @ts-expect-error
+        solarSystem.constellationID = constellation.constellationID;
 
-                universe.solarSystems[solarSystem.solarSystemID] = solarSystem
+        // @ts-expect-error
+        universe.solar_systems[solarSystem.solarSystemID] = solarSystem;
 
-                Object.keys(solarSystem.planets).forEach(planetID => {
-                    const planet = solarSystem.planets[planetID]
-                    planet.solarSystemID = solarSystem.solarSystemID
-                    universe.planets[planetID] = planet
+        // @ts-expect-error
+        Object.keys(solarSystem.planets).forEach((planetID) => {
+          // @ts-expect-error
+          const planet = solarSystem.planets[planetID];
+          // @ts-expect-error
+          planet.solarSystemID = solarSystem.solarSystemID;
+          // @ts-expect-error
+          universe.planets[planetID] = planet;
 
-                    // moons
-                    Object.keys(planet.moons ?? {}).forEach(moonID => {
-                        const moon = planet.moons[moonID]
-                        moon.planetID = planetID
-                        universe.moons[moonID] = moon
-                    })
-                    planet.moons = Object.keys(planet.moons ?? {})
+          // moons
+          Object.keys(planet.moons ?? {}).forEach((moonID) => {
+            const moon = planet.moons[moonID];
+            moon.planetID = planetID;
+            // @ts-expect-error
+            universe.moons[moonID] = moon;
+          });
+          planet.moons = Object.keys(planet.moons ?? {});
 
-                    // asteroid belts
-                    Object.keys(planet.asteroidBelts ?? {}).forEach(asteroidBeltID => {
-                        universe.asteroidBelts[asteroidBeltID] = planet.asteroidBelts[asteroidBeltID]
-                        universe.asteroidBelts[asteroidBeltID].planetID = planetID
-                    })
-                    planet.asteroidBelts = Object.keys(planet.asteroidBelts ?? {})
-                })
-                solarSystem.planets = Object.keys(solarSystem.planets)
+          // asteroid belts
+          Object.keys(planet.asteroidBelts ?? {}).forEach((asteroidBeltID) => {
+            // @ts-expect-error
+            universe.asteroid_belts[asteroidBeltID] =
+              planet.asteroidBelts[asteroidBeltID];
+            // @ts-expect-error
+            universe.asteroid_belts[asteroidBeltID].planetID = planetID;
+          });
+          planet.asteroidBelts = Object.keys(planet.asteroidBelts ?? {});
+        });
+        // @ts-expect-error
+        solarSystem.planets = Object.keys(solarSystem.planets);
 
-                Object.keys(solarSystem.stargates ?? {}).forEach(stargateID => {
-                    universe.stargates[stargateID] = solarSystem.stargates[stargateID]
-                    universe.stargates[stargateID].solarSystemID = solarSystem.solarSystemID
-                })
-                solarSystem.stargates = Object.keys(solarSystem.stargates)
+        // @ts-expect-error
+        Object.keys(solarSystem.stargates ?? {}).forEach((stargateID) => {
+          // @ts-expect-error
+          universe.stargates[stargateID] = solarSystem.stargates[stargateID];
+          // @ts-expect-error
+          universe.stargates[stargateID].solarSystemID =
+            // @ts-expect-error
+            solarSystem.solarSystemID;
+        });
+        // @ts-expect-error
+        solarSystem.stargates = Object.keys(solarSystem.stargates);
 
-                if (solarSystem.star) {
-                    universe.stars[solarSystem.star.id] = solarSystem.star
-                    solarSystem.star = solarSystem.star.id
-                }
-
-            }
+        // @ts-expect-error
+        if (solarSystem.star) {
+          // @ts-expect-error
+          universe.stars[solarSystem.star.id] = solarSystem.star;
+          // @ts-expect-error
+          solarSystem.star = solarSystem.star.id;
         }
+      }
     }
-    console.timeEnd("parsing universe: " + universeName)
+    universeProgress.increment();
+    multibar.update();
+  }
+  totalProgress.increment();
+  multibar.remove(universeProgress);
+  multibar.update();
 }
 
-Object.keys(universe).forEach(key => {
-    console.time("writing " + key + ".json")
-    fs.writeFileSync(path.join(OUTDIR, key + ".json"), JSON.stringify(universe[key]))
-    console.timeEnd("writing " + key + ".json")
-})
-*/
-/**
- * Step 3: Create an index file
- */
-/*
-console.time("generating index.json")
-const outputFilenames = [
-    ...[...inputFiles, ...extraFiles].map(file => file.outFile ?? path.basename(file.path.replace(".yaml", ".json"))),
-    ...Object.keys(universe).map(key => key + ".json")
-]
-outputFilenames.sort()
+await Promise.all(
+  Object.keys(universe).map(async (_key) => {
+    // ugly hack to get around typescript complaining about the key being a string
+    const key = _key as keyof typeof universe;
 
-const index = {
-    files: outputFilenames
-        .map(name => ({
-            name,
-            size: fs.statSync(path.join(OUTDIR, name)).size,
-            mtime: fs.statSync(path.join(OUTDIR, name)).mtime,
-            url: BASE_URL + name,
-        }))
-        .reduce((obj, entry) => Object.assign(obj, {[entry.name]: entry}), {}),
-    sdeTimestamp: fs.statSync(path.join(SDE_ROOT, inputFiles[0].path)).mtime,
-    timestamp: new Date(),
-}
+    const progress = multibar.create(Object.keys(universe[key]).length, 0, {
+      title: `Generating ${key}`.padEnd(30),
+    });
+    multibar.update();
 
-fs.writeFileSync(path.join(OUTDIR, "index.json"), JSON.stringify(index, null, 2))
-console.timeEnd("generating index.json")
-*/
+    // create required directories
+    const collectionPath = path.join(
+      options.outPath,
+      "latest",
+      "universe",
+      key,
+    );
+    if (!fs.existsSync(collectionPath)) {
+      fs.mkdirSync(collectionPath, { recursive: true });
+    }
+
+    // write index file
+    const allIds = Object.keys(universe[key]).map((id) => parseInt(id));
+    const indexPath = path.join(
+      options.outPath,
+      "latest",
+      "universe",
+      `${key}.json`,
+    );
+    await fs.promises.writeFile(indexPath, JSON.stringify(allIds));
+
+    Object.entries(universe[key]).forEach(([key, value], index) => {
+      if (index % 100 === 0) {
+        multibar.update();
+      }
+      progress.increment();
+
+      fs.writeFileSync(
+        path.join(collectionPath, `${key}.json`),
+        JSON.stringify(value),
+      );
+    });
+
+    // write schema
+    const pathArgumentName = `${key.slice(0, -1)}_id`;
+    const modelName = pascalCase(key.slice(0, -1));
+
+    const jsonSchema = js2schema(Object.values(universe[key]), {
+      title: modelName,
+      shouldConvertNumberString: true,
+      typeResolvers: {},
+    });
+    const openApiSchema = await convert(jsonSchema);
+
+    // @ts-expect-error
+    Object.values(openApiSchema.items.properties ?? []).forEach(
+      (property: any) => {
+        delete property.description;
+      },
+    );
+
+    // @ts-expect-error
+    schema.components.schemas[modelName] = {
+      // @ts-expect-error
+      ...openApiSchema.items,
+      description: `Represents a ${modelName}`,
+    };
+
+    // @ts-expect-error
+    schema.paths[`/universe/${key}`] = {
+      get: {
+        tags: ["Universe"],
+        description: `Get all ${modelName} IDs`,
+        operationId: `get${modelName}Ids`,
+        responses: {
+          200: {
+            description: `A list of all ${modelName} IDs`,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "array",
+                  items: {
+                    type: "integer",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    // @ts-expect-error
+    schema.paths[`/universe/${key}/{${pathArgumentName}}`] = {
+      get: {
+        tags: ["Universe"],
+        description: `Get ${modelName} by its ID`,
+        operationId: `get${modelName}ById`,
+        parameters: [
+          {
+            name: `${pathArgumentName}`,
+            in: "path",
+            description: `The ID of the ${modelName} to get`,
+            required: true,
+            schema: {
+              type: "integer",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: `The requested ${modelName}`,
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: `#/components/schemas/${modelName}`,
+                },
+              },
+            },
+          },
+          404: {
+            description: `The requested ${modelName} was not found`,
+          },
+        },
+      },
+    };
+
+    progress.stop();
+    multibar.remove(progress);
+    multibar.update();
+  }),
+);
+
+// write the schema file
+await fs.promises.writeFile(
+  path.join(options.outPath, "latest", `swagger.json`),
+  JSON.stringify(schema, null, 2),
+);
+
+totalProgress.stop();
+multibar.stop();

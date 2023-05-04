@@ -14,10 +14,7 @@ const OUTDIR = "./out";
 const BASE_URL = "https://sde.jita.space/";
 
 // Converts an array of objects in the format [obj1, obj2, obj3] to {[obj1.id]: obj1, [obj2.id]: obj2, [obj3.id]: obj3}
-const fromArrayOfObjectsToMap = (
-  array: object[],
-  { path, idAttributeName },
-) => {
+const fromArrayOfObjectsToMap = (array, { path, idAttributeName }) => {
   const map = {};
   array.forEach((item) => {
     if (map.hasOwnProperty(item[idAttributeName])) {
