@@ -1,9 +1,18 @@
 {
   "extends": "../../tsconfig.json",
+  "include": ["./**/*.ts"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist",
+  },
   "ts-node": {
     "esm": true,
+    "files": true,
+    "transpileOnly": true,
+    "compilerOptions": {
+      "esModuleInterop": true
+    },
     "experimentalSpecifierResolution": "node"
-  },
-  "include": ["./src/**/*.ts"],
-  "exclude": ["node_modules"]
+  }
 }
