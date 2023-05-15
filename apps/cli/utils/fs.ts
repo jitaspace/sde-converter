@@ -63,7 +63,7 @@ export async function sdeFolderChecksum(
     const content = fs.readFileSync(path.resolve(sdeRootPath, entry.name));
     checksum.update(content);
     progress.increment();
-    //globalProgress.update();
+    globalProgress.update();
   }
 
   progress.stop();

@@ -13,6 +13,11 @@ import { loadFile } from "../sources/sde";
 import { getUniverseSourceData } from "../sources/sde_universe";
 import { mkdir } from "./fs";
 
+export function sdeCamelCase(str: string) {
+  const result = camelCase(str);
+  return result.endsWith("Id") ? result.slice(0, -2) + "ID" : result;
+}
+
 export async function generateCollectionFiles(
   collectionId: keyof typeof collections,
   schema: {
@@ -175,14 +180,14 @@ export async function generateCollectionFiles(
     },
   };
 
-  schema.paths[`${collectionId}/{${camelCase(collection.idAttribute)}}`] = {
+  schema.paths[`${collectionId}/{${sdeCamelCase(collection.idAttribute)}}`] = {
     get: {
       tags: collection.tags,
       description: `Get ${capitalCase(collection.model.name)} by its ID`,
       operationId: `get${pascalCase(collection.model.name)}ById`,
       parameters: [
         {
-          name: camelCase(collection.idAttribute),
+          name: sdeCamelCase(collection.idAttribute),
           in: "path",
           description: `The ID of the ${capitalCase(
             collection.model.name,

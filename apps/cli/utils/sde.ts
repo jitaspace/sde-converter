@@ -26,7 +26,7 @@ export async function ensureSdePresentAndExtracted() {
     // calculate folder checksum
     const currentChecksum = await sdeFolderChecksum(
       path.resolve(getWorkingDirectory(), "sde.zip"),
-      sdeRootPath,
+      getWorkingDirectory(),
     );
 
     if (latestChecksum === currentChecksum) {
@@ -51,7 +51,7 @@ export async function ensureSdePresentAndExtracted() {
     const currentChecksum = await sdeZipChecksum(localSdePath);
 
     if (latestChecksum === currentChecksum) {
-      // SDE archive is up to date, we can extract it!
+      // SDE archive is up-to-date, we can extract it!
       globalProgress.log("SDE archive is up to date!\n");
     } else {
       // SDE archive is outdated, we need to download a new one!
