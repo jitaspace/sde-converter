@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import * as path from "node:path";
 import convert from "@openapi-contrib/json-schema-to-openapi-schema";
-import { capitalCase, pascalCase, snakeCase } from "change-case";
+import { camelCase, capitalCase, pascalCase } from "change-case";
 import { js2schema } from "js2schema";
 
 import { SDE_PATH } from "../commands/generate";
@@ -175,14 +175,14 @@ export async function generateCollectionFiles(
     },
   };
 
-  schema.paths[`${collectionId}/{${snakeCase(collection.idAttribute)}}`] = {
+  schema.paths[`${collectionId}/{${camelCase(collection.idAttribute)}}`] = {
     get: {
       tags: collection.tags,
       description: `Get ${capitalCase(collection.model.name)} by its ID`,
       operationId: `get${pascalCase(collection.model.name)}ById`,
       parameters: [
         {
-          name: snakeCase(collection.idAttribute),
+          name: camelCase(collection.idAttribute),
           in: "path",
           description: `The ID of the ${capitalCase(
             collection.model.name,

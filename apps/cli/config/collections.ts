@@ -79,7 +79,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Inventory"],
   },
-  "/inventory/unique_names": {
+  "/inventory/uniqueNames": {
     datasource: {
       type: "sde",
       name: "bsd/invUniqueNames.yaml",
@@ -112,7 +112,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Character"],
   },
-  "/characters/agents_in_space": {
+  "/characters/agentsInSpace": {
     datasource: {
       type: "sde",
       name: "fsd/agentsInSpace.yaml",
@@ -189,7 +189,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Character"],
   },
-  "/universe/contraband_types": {
+  "/universe/contrabandTypes": {
     datasource: {
       type: "sde",
       name: "fsd/contrabandTypes.yaml",
@@ -200,7 +200,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Universe"],
   },
-  "/universe/control_tower_resources": {
+  "/universe/controlTowerResources": {
     datasource: {
       type: "sde",
       name: "fsd/controlTowerResources.yaml",
@@ -222,7 +222,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Corporation"],
   },
-  "/dogma/attribute_categories": {
+  "/dogma/attributeCategories": {
     datasource: {
       type: "sde",
       name: "fsd/dogmaAttributeCategories.yaml",
@@ -321,7 +321,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Market"],
   },
-  "/universe/meta_groups": {
+  "/universe/metaGroups": {
     datasource: {
       type: "sde",
       name: "fsd/metaGroups.yaml",
@@ -332,7 +332,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Universe"],
   },
-  "/corporations/npc_corporation_divisions": {
+  "/corporations/npcCorporationDivisions": {
     datasource: {
       type: "sde",
       name: "fsd/npcCorporationDivisions.yaml",
@@ -343,7 +343,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Corporation"],
   },
-  "/corporations/npc_corporations": {
+  "/corporations/npcCorporations": {
     datasource: {
       type: "sde",
       name: "fsd/npcCorporations.yaml",
@@ -354,7 +354,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Corporation"],
   },
-  "/universe/planet_schematics": {
+  "/universe/planetSchematics": {
     datasource: {
       type: "sde",
       name: "fsd/planetSchematics.yaml",
@@ -376,7 +376,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Universe"],
   },
-  "/characters/research_agents": {
+  "/characters/researchAgents": {
     datasource: {
       type: "sde",
       name: "fsd/researchAgents.yaml",
@@ -387,7 +387,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Character"],
   },
-  "/universe/skin_licenses": {
+  "/universe/skinLicenses": {
     datasource: {
       type: "sde",
       name: "fsd/skinLicenses.yaml",
@@ -398,7 +398,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Universe"],
   },
-  "/universe/skin_materials": {
+  "/universe/skinMaterials": {
     datasource: {
       type: "sde",
       name: "fsd/skinMaterials.yaml",
@@ -409,7 +409,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Universe"],
   },
-  "/universe/station_operations": {
+  "/universe/stationOperations": {
     datasource: {
       type: "sde",
       name: "fsd/stationOperations.yaml",
@@ -420,7 +420,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Universe"],
   },
-  "/universe/station_services": {
+  "/universe/stationServices": {
     datasource: {
       type: "sde",
       name: "fsd/stationServices.yaml",
@@ -431,7 +431,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Universe"],
   },
-  "/universe/tournament_rule_sets": {
+  "/universe/tournamentRuleSets": {
     datasource: {
       type: "sde",
       name: "fsd/tournamentRuleSets.yaml",
@@ -442,7 +442,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Universe"],
   },
-  "/universe/translation_languages": {
+  "/universe/translationLanguages": {
     datasource: {
       type: "sde",
       name: "fsd/translationLanguages.yaml",
@@ -475,7 +475,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Universe"],
   },
-  "/universe/type_materials": {
+  "/universe/typeMaterials": {
     datasource: {
       type: "sde",
       name: "fsd/typeMaterials.yaml",
@@ -486,7 +486,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Universe"],
   },
-  "/universe/asteroid_belts": {
+  "/universe/asteroidBelts": {
     datasource: {
       type: "sde-universe",
       name: "asteroidBelts",
@@ -541,7 +541,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Universe"],
   },
-  "/universe/solar_systems": {
+  "/universe/solarSystems": {
     datasource: {
       type: "sde-universe",
       name: "solarSystems",
@@ -574,7 +574,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Universe"],
   },
-  "/characters/agent_types": {
+  "/characters/agentTypes": {
     datasource: {
       type: "hoboleaks",
       filename: "agenttypes.json",
@@ -596,7 +596,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Dogma"],
   },
-  "/wallet/accounting_entry_types": {
+  "/wallet/accountingEntryTypes": {
     datasource: {
       type: "hoboleaks",
       filename: "accountingentrytypes.json",
@@ -607,7 +607,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Wallet"],
   },
-  "/universe/repackaged_volumes": {
+  "/universe/repackagedVolumes": {
     datasource: {
       type: "hoboleaks",
       filename: "repackagedvolumes.json",
@@ -618,7 +618,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Universe"],
   },
-  "/dogma/dynamic_attributes": {
+  "/dogma/dynamicAttributes": {
     datasource: {
       type: "hoboleaks",
       filename: "dynamicitemattributes.json",
@@ -640,7 +640,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Dogma"],
   },
-  "/universe/clone_states": {
+  "/universe/cloneStates": {
     datasource: {
       type: "hoboleaks",
       filename: "clonestates.json",
@@ -662,7 +662,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Universe"],
   },
-  "/universe/skin_material_names": {
+  "/universe/skinMaterialNames": {
     datasource: {
       type: "hoboleaks",
       filename: "skinmaterialnames.json",
@@ -673,7 +673,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Universe"],
   },
-  "/universe/graphic_material_sets": {
+  "/universe/graphicMaterialSets": {
     datasource: {
       type: "hoboleaks",
       filename: "graphicmaterialsets.json",
@@ -695,7 +695,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Industry"],
   },
-  "/industry/assembly_lines": {
+  "/industry/assemblyLines": {
     datasource: {
       type: "hoboleaks",
       filename: "industryassemblylines.json",
@@ -706,7 +706,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Industry"],
   },
-  "/industry/installation_types": {
+  "/industry/installationTypes": {
     datasource: {
       type: "hoboleaks",
       filename: "industryinstallationtypes.json",
@@ -717,7 +717,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Industry"],
   },
-  "/industry/modifier_sources": {
+  "/industry/modifierSources": {
     datasource: {
       type: "hoboleaks",
       filename: "industrymodifiersources.json",
@@ -728,7 +728,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Industry"],
   },
-  "/industry/target_filters": {
+  "/industry/targetFilters": {
     datasource: {
       type: "hoboleaks",
       filename: "industrytargetfilters.json",
@@ -739,7 +739,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Industry"],
   },
-  "/universe/compressible_types": {
+  "/universe/compressibleTypes": {
     datasource: {
       type: "hoboleaks",
       filename: "compressibletypes.json",
