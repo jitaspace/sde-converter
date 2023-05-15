@@ -1,0 +1,220 @@
+import fs from "node:fs";
+import * as path from "node:path";
+import convert from "@openapi-contrib/json-schema-to-openapi-schema";
+import { capitalCase, pascalCase, snakeCase } from "change-case";
+import { js2schema } from "js2schema";
+
+import { SDE_PATH } from "../commands/generate";
+import { collections } from "../config/collections";
+import { TITLE_WIDTH, getWorkingDirectory } from "../lib/cli";
+import { globalProgress } from "../lib/progress";
+import { getHoboleaksFile } from "../sources/hoboleaks";
+import { loadFile } from "../sources/sde";
+import { getUniverseSourceData } from "../sources/sde_universe";
+import { mkdir } from "./fs";
+
+export async function generateCollectionFiles(
+  collectionId: keyof typeof collections,
+  schema: {
+    paths: Record<string, any>;
+    components: {
+      schemas: Record<string, any>;
+    };
+  },
+) {
+  const sdeRoot = path.resolve(getWorkingDirectory(), SDE_PATH);
+  const outRoot = path.resolve(getWorkingDirectory(), "dist");
+  const collection = collections[collectionId];
+
+  if (collection === undefined) {
+    throw new Error(`Unknown collection ${collectionId}`);
+  }
+
+  const progress = globalProgress.create(0, 0, {
+    title: `Generating ${collectionId}`.padEnd(TITLE_WIDTH),
+  });
+  globalProgress.update();
+
+  // Read file
+  const data = await (async () => {
+    switch (collection.datasource.type) {
+      case "sde":
+        return loadFile(collection.datasource.name, sdeRoot);
+      case "sde-universe":
+        return await getUniverseSourceData(collection.datasource.name);
+      case "hoboleaks":
+        return await getHoboleaksFile(collection.datasource.filename);
+      default:
+        throw new Error(
+          `Unsupported datasource type ${collection.datasource.type}`,
+        );
+    }
+  })();
+  progress.setTotal(Object.keys(data).length);
+  globalProgress.update();
+
+  // TODO: transformations?
+  // data = file.transformations.reduce((data, transformation) => transformation(data, file), data)
+
+  // create required directories
+  const bundlesPath = path.join(
+    getWorkingDirectory(),
+    "bundled",
+    ...collectionId.split("/"),
+  );
+  const indexPath = path.join(
+    getWorkingDirectory(),
+    "latest",
+    `${collectionId}.json`,
+  );
+  const collectionPath = path.join(
+    getWorkingDirectory(),
+    "latest",
+    collectionId,
+  );
+  mkdir(bundlesPath);
+  mkdir(collectionPath);
+
+  // Write bundled file
+  const outPath = path.join(
+    bundlesPath,
+    `${collectionId.split("/").at(-1)}.json`,
+  );
+  fs.writeFileSync(outPath, JSON.stringify(data));
+
+  const idAttributeType = Object.keys(data).every(
+    (key) => key.match(/^\d+$/) != null,
+  )
+    ? "number"
+    : "string";
+
+  // write index file
+  const allIds = Object.keys(data).map((key) =>
+    idAttributeType === "number" ? parseInt(key) : key,
+  );
+  fs.writeFileSync(indexPath, JSON.stringify(allIds));
+
+  globalProgress.update();
+
+  // write individual entry files
+  mkdir(collectionPath);
+  Object.entries(data).forEach(([key, value], index) => {
+    if (index % 100 === 0) {
+      globalProgress.update();
+    }
+    progress.increment();
+    fs.writeFileSync(
+      path.join(collectionPath, `${key}.json`),
+      JSON.stringify(value),
+    );
+  });
+
+  progress.stop();
+  globalProgress.update();
+
+  // write schema file
+  const jsonSchema = js2schema(Object.values(data), {
+    title: "",
+    shouldConvertNumberString: true,
+    typeResolvers: {},
+  });
+  const openApiSchema = await convert(jsonSchema);
+
+  // @ts-expect-error
+  Object.values(openApiSchema.items.properties ?? []).forEach(
+    (property: any) => {
+      delete property.description;
+    },
+  );
+
+  schema.components.schemas[pascalCase(collection.model.name)] = {
+    // @ts-expect-error
+    ...openApiSchema.items,
+    description:
+      collection.model.description ??
+      `Represents a ${capitalCase(collection.model.name)}`,
+    "x-examples": {
+      // random example
+      example:
+        data[
+          // @ts-expect-error
+          Object.keys(data)[
+            Math.floor(Math.random() * Object.keys(data).length)
+          ]
+        ],
+    },
+  };
+
+  schema.paths[`${collectionId}`] = {
+    get: {
+      tags: collection.tags,
+      description: `Get all ${capitalCase(collection.model.name)} IDs`,
+      operationId: `getAll${pascalCase(collection.model.name)}Ids`,
+      examples: {
+        foo: {
+          value: [1, 2, 3],
+        },
+      },
+      responses: {
+        200: {
+          description: `A list of all ${capitalCase(
+            collection.model.name,
+          )} IDs`,
+          content: {
+            "application/json": {
+              schema: {
+                type: "array",
+                items: {
+                  type: idAttributeType,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  };
+
+  schema.paths[`${collectionId}/{${snakeCase(collection.idAttribute)}}`] = {
+    get: {
+      tags: collection.tags,
+      description: `Get ${capitalCase(collection.model.name)} by its ID`,
+      operationId: `get${pascalCase(collection.model.name)}ById`,
+      parameters: [
+        {
+          name: snakeCase(collection.idAttribute),
+          in: "path",
+          description: `The ID of the ${capitalCase(
+            collection.model.name,
+          )} to get`,
+          required: true,
+          schema: {
+            type: idAttributeType,
+          },
+        },
+      ],
+      responses: {
+        200: {
+          description: `The requested ${capitalCase(collection.model.name)}`,
+          content: {
+            "application/json": {
+              schema: {
+                $ref: `#/components/schemas/${pascalCase(
+                  collection.model.name,
+                )}`,
+              },
+            },
+          },
+        },
+        404: {
+          description: `The requested ${capitalCase(
+            collection.model.name,
+          )} was not found`,
+        },
+      },
+    },
+  };
+
+  globalProgress.remove(progress);
+  globalProgress.update();
+}

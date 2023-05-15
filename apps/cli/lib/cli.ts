@@ -5,6 +5,8 @@ import generate from "../commands/generate";
 import validate from "../commands/validate";
 import packageJson from "../package.json" assert {type: "json"}
 
+export const TITLE_WIDTH = 35;
+
 program
   .name("sde-converter")
   .version(packageJson.version)

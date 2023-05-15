@@ -3,8 +3,9 @@
   "include": ["./**/*.ts"],
   "exclude": ["node_modules"],
   "compilerOptions": {
+    "target": "ES2017",
     "rootDir": ".",
-    "outDir": "dist",
+    "outDir": "dist"
   },
   "ts-node": {
     "esm": true,

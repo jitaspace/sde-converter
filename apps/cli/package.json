@@ -10,12 +10,14 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc --noEmit ./index.ts && esbuild ./index.ts --bundle --platform=node --format=cjs --outfile=./dist/index.js",
+    "build1": "tsc --noEmit --target es2015 ./index.ts",
     "generate": "mkdir -p out && ts-node index.ts generate",
     "validate": "ts-node index.ts validate",
     "rclone:sync": "rclone sync ./out sde2.jita.space:/jitaspace-sde -P",
     "rclone:delete": "rclone delete sde2.jita.space:/jitaspace-sde -P"
   },
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^4.7.0",
     "@commander-js/extra-typings": "^10.0.3",
     "@jsonhero/schema-infer": "^0.1.4",
     "@openapi-contrib/json-schema-to-openapi-schema": "^2.2.5",
@@ -25,8 +27,10 @@
     "cli-progress": "^3.12.0",
     "commander": "^10.0.1",
     "figlet": "^1.6.0",
+    "inquirer": "^9.2.2",
     "js-yaml": "^4.1.0",
     "js2schema": "^1.0.8",
+    "node-html-parser": "^6.1.5",
     "node-stream-zip": "^1.15.0",
     "yaml": "^2.1.3",
     "zod": "^3.21.4"

@@ -43,6 +43,37 @@ export async function sdeZipChecksum(path: string) {
   return checksum.digest("hex");
 }
 
+export async function sdeFolderChecksum(
+  sdeZipPath: string,
+  sdeRootPath: string,
+) {
+  const zip = new StreamZip.async({ file: sdeZipPath });
+  const entries = await zip.entries();
+  const checksum = crypto.createHash("md5");
+
+  const progress = globalProgress.create(await zip.entriesCount, 0, {
+    title: "Computing SDE Checksum",
+  });
+  globalProgress.update();
+
+  for (const entry of Object.values(entries)) {
+    if (entry.isDirectory) {
+      continue;
+    }
+    const content = fs.readFileSync(path.resolve(sdeRootPath, entry.name));
+    checksum.update(content);
+    progress.increment();
+    //globalProgress.update();
+  }
+
+  progress.stop();
+
+  globalProgress.remove(progress);
+  globalProgress.update();
+
+  return checksum.digest("hex");
+}
+
 export async function unzipSde(zipFilePath: string, targetPath: string) {
   const zip = new StreamZip.async({ file: zipFilePath });
   const entries = await zip.entries();
