@@ -3,7 +3,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import StreamZip from "node-stream-zip";
 
-import { globalProgress } from "../lib/progress";
+import { globalProgress } from "../lib/progress.js";
 
 // Create directory (recursively) if it doesn't exist
 export const mkdir = (path: string) => {
@@ -23,14 +23,19 @@ export async function sdeZipChecksum(path: string) {
   });
   globalProgress.update();
 
+  let entriesProcessed = 0;
   for (const entry of Object.values(entries)) {
+    // avoid updating progress bar every iteration, as it will become a bottleneck
+    if (entriesProcessed % 100 === 0) {
+      globalProgress.update();
+    }
     if (entry.isDirectory) {
       continue;
     }
     const content = await zip.entryData(entry.name);
     checksum.update(content);
     progress.increment();
-    globalProgress.update();
+    entriesProcessed++;
   }
 
   await zip.close();
@@ -56,14 +61,19 @@ export async function sdeFolderChecksum(
   });
   globalProgress.update();
 
+  let entriesProcessed = 0;
   for (const entry of Object.values(entries)) {
+    // avoid updating progress bar every iteration, as it will become a bottleneck
+    if (entriesProcessed % 100 === 0) {
+      globalProgress.update();
+    }
     if (entry.isDirectory) {
       continue;
     }
     const content = fs.readFileSync(path.resolve(sdeRootPath, entry.name));
     checksum.update(content);
     progress.increment();
-    globalProgress.update();
+    entriesProcessed++;
   }
 
   progress.stop();

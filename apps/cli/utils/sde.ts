@@ -5,11 +5,11 @@ import {
   LOCAL_SDE_FILENAME,
   SDE_CHECKSUM_URL,
   SDE_DOWNLOAD_URL,
-} from "../config/constants";
-import { getWorkingDirectory } from "../lib/cli";
-import { globalProgress } from "../lib/progress";
-import { downloadFile } from "./download";
-import { mkdir, sdeFolderChecksum, sdeZipChecksum, unzipSde } from "./fs";
+} from "../config/constants.js";
+import { getWorkingDirectory } from "../lib/cli.js";
+import { globalProgress } from "../lib/progress.js";
+import { downloadFile } from "./download.js";
+import { mkdir, sdeFolderChecksum, sdeZipChecksum, unzipSde } from "./fs.js";
 
 export async function ensureSdePresentAndExtracted() {
   // download latest checksum

@@ -2,9 +2,9 @@ import fs from "node:fs";
 import * as path from "node:path";
 import * as YAML from "js-yaml";
 
-import { SDE_PATH } from "../commands/generate";
-import { TITLE_WIDTH, getWorkingDirectory } from "../lib/cli";
-import { globalProgress } from "../lib/progress";
+import { SDE_PATH } from "../commands/generate.js";
+import { TITLE_WIDTH, getWorkingDirectory } from "../lib/cli.js";
+import { globalProgress } from "../lib/progress.js";
 
 /**
  * This is a special file that parses and flattens the contents of the `fsd/universe` folder.

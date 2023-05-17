@@ -1,17 +1,20 @@
 {
-  "name": "sde-converter",
-  "version": "0.1.0",
+  "name": "@jitaspace/sde-converter",
+  "version": "1.0.5",
   "description": "EVE SDE Converter to JSON",
-  "main": "index.ts",
-  "types": "index.ts",
+  "main": "dist/index.cjs",
+  "bin": "dist/index.cjs",
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "repository": "https://github.com/eve-graph/sde-converter.git",
   "author": "João Neto <joao@neto.pt>",
   "license": "MIT",
   "scripts": {
-    "build": "tsc --noEmit ./index.ts && esbuild ./index.ts --bundle --platform=node --format=cjs --outfile=./dist/index.js",
-    "build1": "tsc --noEmit --target es2015 ./index.ts",
+    "build": "tsc --noEmit && esbuild index.ts --bundle --platform=node --format=cjs --outfile=./dist/index.cjs",
     "generate": "mkdir -p out && ts-node index.ts generate",
+    "prepublish": "tsc",
     "validate": "ts-node index.ts validate",
     "rclone:sync": "rclone sync ./out sde2.jita.space:/jitaspace-sde -P",
     "rclone:delete": "rclone delete sde2.jita.space:/jitaspace-sde -P"

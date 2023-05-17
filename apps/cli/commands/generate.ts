@@ -2,16 +2,15 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { createCommand } from "@commander-js/extra-typings";
 
-import { collections } from "../config/collections";
-import { TITLE_WIDTH, getWorkingDirectory } from "../lib/cli";
-import { globalProgress } from "../lib/progress";
-import { generateCollectionFiles } from "../utils/collections";
-import { ensureSdePresentAndExtracted } from "../utils/sde";
+import { collections } from "../config/collections.js";
+import { TITLE_WIDTH, getWorkingDirectory } from "../lib/cli.js";
+import { globalProgress } from "../lib/progress.js";
+import { generateCollectionFiles } from "../utils/collections.js";
+import { ensureSdePresentAndExtracted } from "../utils/sde.js";
 
 export const SDE_PATH = "sde";
-export const OUT_PATH = "dist";
 
-export default createCommand("generate").action(async (options) => {
+export default createCommand("generate").action(async () => {
   await ensureSdePresentAndExtracted();
 
   const totalProgress = globalProgress.create(
@@ -54,9 +53,7 @@ export default createCommand("generate").action(async (options) => {
 
   globalProgress.log(`Writing files to ${path.join(getWorkingDirectory())}`);
 
-  for (const [collectionName, collectionMetadata] of Object.entries(
-    collections,
-  )) {
+  for (const collectionName of Object.keys(collections)) {
     await generateCollectionFiles(collectionName, schema);
     totalProgress.increment();
     globalProgress.update();

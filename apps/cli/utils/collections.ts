@@ -4,14 +4,14 @@ import convert from "@openapi-contrib/json-schema-to-openapi-schema";
 import { camelCase, capitalCase, pascalCase } from "change-case";
 import { js2schema } from "js2schema";
 
-import { SDE_PATH } from "../commands/generate";
-import { collections } from "../config/collections";
-import { TITLE_WIDTH, getWorkingDirectory } from "../lib/cli";
-import { globalProgress } from "../lib/progress";
-import { getHoboleaksFile } from "../sources/hoboleaks";
-import { loadFile } from "../sources/sde";
-import { getUniverseSourceData } from "../sources/sde_universe";
-import { mkdir } from "./fs";
+import { SDE_PATH } from "../commands/generate.js";
+import { collections } from "../config/collections.js";
+import { TITLE_WIDTH, getWorkingDirectory } from "../lib/cli.js";
+import { globalProgress } from "../lib/progress.js";
+import { getHoboleaksFile } from "../sources/hoboleaks.js";
+import { loadFile } from "../sources/sde.js";
+import { getUniverseSourceData } from "../sources/sde_universe.js";
+import { mkdir } from "./fs.js";
 
 export function sdeCamelCase(str: string) {
   const result = camelCase(str);
@@ -28,7 +28,6 @@ export async function generateCollectionFiles(
   },
 ) {
   const sdeRoot = path.resolve(getWorkingDirectory(), SDE_PATH);
-  const outRoot = path.resolve(getWorkingDirectory(), "dist");
   const collection = collections[collectionId];
 
   if (collection === undefined) {
@@ -57,9 +56,6 @@ export async function generateCollectionFiles(
   })();
   progress.setTotal(Object.keys(data).length);
   globalProgress.update();
-
-  // TODO: transformations?
-  // data = file.transformations.reduce((data, transformation) => transformation(data, file), data)
 
   // create required directories
   const bundlesPath = path.join(

@@ -5,8 +5,8 @@
  * - GET /collection/{id} — returns a single item from the collection
  * Pagination is not supported, as the collections are expected to be small and static.
  */
-import { sdeInputFiles } from "../sources/sde";
-import { SdeUniverseSource } from "../sources/sde_universe";
+import { sdeInputFiles } from "../sources/sde.js";
+import { SdeUniverseSource } from "../sources/sde_universe.js";
 
 export type SdeCollection = {
   datasource:

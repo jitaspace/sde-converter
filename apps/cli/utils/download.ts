@@ -3,7 +3,7 @@ import * as path from "node:path";
 import { finished } from "node:stream/promises";
 import fetch, { type Response } from "node-fetch";
 
-import { globalProgress } from "../lib/progress";
+import { globalProgress } from "../lib/progress.js";
 
 function showDownloadProgress(response: Response) {
   const total = parseInt(response.headers.get("content-length") || "0");
@@ -31,7 +31,6 @@ function showDownloadProgress(response: Response) {
     if (isFinished) {
       return;
     }
-    //progress.update(downloaded);
     progress.increment(chunk.length);
   });
 
