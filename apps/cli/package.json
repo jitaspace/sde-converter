@@ -1,6 +1,6 @@
 {
   "name": "@jitaspace/sde-converter",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "EVE SDE Converter to JSON",
   "main": "dist/index.cjs",
   "bin": "dist/index.cjs",
@@ -8,7 +8,7 @@
     "dist"
   ],
   "type": "module",
-  "repository": "https://github.com/eve-graph/sde-converter.git",
+  "repository": "https://github.com/jitaspace/sde-converter.git",
   "author": "João Neto <joao@neto.pt>",
   "license": "MIT",
   "scripts": {
