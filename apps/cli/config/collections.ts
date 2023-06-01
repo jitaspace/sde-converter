@@ -5,6 +5,8 @@
  * - GET /collection/{id} — returns a single item from the collection
  * Pagination is not supported, as the collections are expected to be small and static.
  */
+import { OpenAPIV3 } from "openapi-types";
+
 import { sdeInputFiles } from "../sources/sde.js";
 import { SdeUniverseSource } from "../sources/sde_universe.js";
 
@@ -30,11 +32,13 @@ export type SdeCollection = {
   model: {
     name: string;
     description?: string;
+    patchSchema?: (item: OpenAPIV3.Document) => OpenAPIV3.Document;
   };
   tags: string[];
 };
 
 export const collections: Record<string, SdeCollection> = {
+  /*
   "/inventory/flags": {
     datasource: {
       type: "sde",
@@ -166,7 +170,7 @@ export const collections: Record<string, SdeCollection> = {
       name: "Category",
     },
     tags: ["Universe"],
-  },
+  },*/
   "/universe/certificates": {
     datasource: {
       type: "sde",
@@ -175,6 +179,32 @@ export const collections: Record<string, SdeCollection> = {
     idAttribute: "certificateID",
     model: {
       name: "Certificate",
+      patchSchema: (schema) => {
+        // @ts-expect-error
+        schema.items.properties.skillTypes = {
+          additionalProperties: {
+            type: "object",
+            properties: {
+              basic: {
+                type: "integer",
+              },
+              standard: {
+                type: "integer",
+              },
+              improved: {
+                type: "integer",
+              },
+              advanced: {
+                type: "integer",
+              },
+              elite: {
+                type: "integer",
+              },
+            },
+          },
+        };
+        return schema;
+      },
     },
     tags: ["Universe"],
   },
@@ -197,6 +227,29 @@ export const collections: Record<string, SdeCollection> = {
     idAttribute: "typeID",
     model: {
       name: "ContrabandType",
+      patchSchema: (schema) => {
+        // @ts-expect-error
+        schema.items.properties.factions = {
+          additionalProperties: {
+            type: "object",
+            properties: {
+              attackMinSec: {
+                type: "integer",
+              },
+              confiscateMinSec: {
+                type: "integer",
+              },
+              fineByValue: {
+                type: "integer",
+              },
+              standingLoss: {
+                type: "integer",
+              },
+            },
+          },
+        };
+        return schema;
+      },
     },
     tags: ["Universe"],
   },
@@ -351,6 +404,44 @@ export const collections: Record<string, SdeCollection> = {
     idAttribute: "corporationID",
     model: {
       name: "NPCCorporation",
+      patchSchema: (schema) => {
+        // @ts-expect-error
+        schema.items.properties.corporationTrades = {
+          additionalProperties: {
+            type: "number",
+          },
+        };
+        // @ts-expect-error
+        schema.items.properties.divisions = {
+          additionalProperties: {
+            type: "object",
+            properties: {
+              divisionNumber: {
+                type: "integer",
+              },
+              leaderID: {
+                type: "integer",
+              },
+              size: {
+                type: "integer",
+              },
+            },
+          },
+        };
+        // @ts-expect-error
+        schema.items.properties.exchangeRates = {
+          additionalProperties: {
+            type: "number",
+          },
+        };
+        // @ts-expect-error
+        schema.items.properties.investors = {
+          additionalProperties: {
+            type: "number",
+          },
+        };
+        return schema;
+      },
     },
     tags: ["Corporation"],
   },
@@ -362,6 +453,20 @@ export const collections: Record<string, SdeCollection> = {
     idAttribute: "planetSchematicID",
     model: {
       name: "PlanetSchematic",
+      patchSchema: (schema) => {
+        // @ts-expect-error
+        schema.items.properties.types = {
+          additionalProperties: {
+            type: "object",
+            properties: {
+              isInput: {
+                type: "boolean",
+              },
+            },
+          },
+        };
+        return schema;
+      },
     },
     tags: ["Planetary_Interaction"],
   },
@@ -373,6 +478,15 @@ export const collections: Record<string, SdeCollection> = {
     idAttribute: "raceID",
     model: {
       name: "Race",
+      patchSchema: (schema) => {
+        // @ts-expect-error
+        schema.items.properties.skills = {
+          additionalProperties: {
+            type: "integer",
+          },
+        };
+        return schema;
+      },
     },
     tags: ["Universe"],
   },
@@ -472,6 +586,46 @@ export const collections: Record<string, SdeCollection> = {
     idAttribute: "typeID",
     model: {
       name: "Type",
+      patchSchema: (schema) => {
+        // @ts-expect-error
+        schema.items.properties.traits.properties.types = {
+          additionalProperties: {
+            type: "object",
+            properties: {
+              bonus: {
+                type: "number",
+              },
+              bonusText: {
+                type: "object",
+                properties: {
+                  de: {
+                    type: "string",
+                  },
+                  en: {
+                    type: "string",
+                  },
+                  es: {
+                    type: "string",
+                  },
+                  fr: {
+                    type: "string",
+                  },
+                  ja: {
+                    type: "string",
+                  },
+                  ru: {
+                    type: "string",
+                  },
+                },
+              },
+              importance: {
+                type: "integer",
+              },
+            },
+          },
+        };
+        return schema;
+      },
     },
     tags: ["Universe"],
   },
@@ -516,6 +670,50 @@ export const collections: Record<string, SdeCollection> = {
     idAttribute: "moonID",
     model: {
       name: "Moon",
+      patchSchema: (schema) => {
+        // @ts-expect-error
+        schema.items.properties.npcStations = {
+          additionalProperties: {
+            type: "object",
+            properties: {
+              graphicID: {
+                type: "integer",
+              },
+              isConquerable: {
+                type: "boolean",
+              },
+              operationID: {
+                type: "integer",
+              },
+              ownerID: {
+                type: "integer",
+              },
+              position: {
+                type: "array",
+                items: {
+                  type: "number",
+                },
+              },
+              reprocessingEfficiency: {
+                type: "number",
+              },
+              reprocessingHangarFlag: {
+                type: "number",
+              },
+              reprocessingStationsTake: {
+                type: "number",
+              },
+              typeID: {
+                type: "integer",
+              },
+              useOperationName: {
+                type: "boolean",
+              },
+            },
+          },
+        };
+        return schema;
+      },
     },
     tags: ["Universe"],
   },
@@ -527,6 +725,47 @@ export const collections: Record<string, SdeCollection> = {
     idAttribute: "planetID",
     model: {
       name: "Planet",
+      patchSchema: (schema) => {
+        // @ts-expect-error
+        schema.items.properties.npcStations = {
+          additionalProperties: {
+            type: "object",
+            properties: {
+              graphicID: {
+                type: "integer",
+              },
+              isConquerable: {
+                type: "boolean",
+              },
+              operationID: {
+                type: "integer",
+              },
+              ownerID: {
+                type: "integer",
+              },
+              position: {
+                type: "array",
+                items: {
+                  type: "number",
+                },
+              },
+              reprocessingEfficiency: {
+                type: "number",
+              },
+              reprocessingHangarFlag: {
+                type: "number",
+              },
+              reprocessingStationsTake: {
+                type: "number",
+              },
+              typeID: {
+                type: "integer",
+              },
+            },
+          },
+        };
+        return schema;
+      },
     },
     tags: ["Universe"],
   },
@@ -626,6 +865,26 @@ export const collections: Record<string, SdeCollection> = {
     idAttribute: "attributeID",
     model: {
       name: "DynamicAttribute",
+      patchSchema: (schema) => {
+        // @ts-expect-error
+        schema.items.properties.attributeIDs = {
+          additionalProperties: {
+            type: "object",
+            properties: {
+              max: {
+                type: "number",
+              },
+              min: {
+                type: "number",
+              },
+              highIsGood: {
+                type: "boolean",
+              },
+            },
+          },
+        };
+        return schema;
+      },
     },
     tags: ["Dogma"],
   },
@@ -648,6 +907,15 @@ export const collections: Record<string, SdeCollection> = {
     idAttribute: "raceID",
     model: {
       name: "CloneState",
+      patchSchema: (schema) => {
+        // @ts-expect-error
+        schema.items.properties.skills = {
+          additionalProperties: {
+            type: "integer",
+          },
+        };
+        return schema;
+      },
     },
     tags: ["Universe"],
   },

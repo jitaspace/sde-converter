@@ -7,9 +7,9 @@ import { getEveRefDataDirectoryContents } from "../utils/everef.js";
 export default createCommand("validate").action(async (options) => {
   console.log("work dir is:", getWorkingDirectory());
   const contents = await getEveRefDataDirectoryContents(
-    "https://data.everef.net/ccp/sde/",
+    "https://data.everef.net/public-contracts/",
   );
-  console.log(contents);
+  console.log(JSON.stringify(contents, null, 2));
 
   globalProgress.stop();
 });

@@ -18,7 +18,7 @@ export type SdeSourceFile = {
 
 /**
  * The list of SDE files to be loaded, and transformations to be applied to them,
- * so they are all a map of ID ->snakeC object.
+ * so they are all a map of ID -> object.
  */
 export const sdeInputFiles: Record<string, SdeSourceFile> = {
   "bsd/invFlags.yaml": {

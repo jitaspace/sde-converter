@@ -119,7 +119,10 @@ export async function generateCollectionFiles(
     shouldConvertNumberString: true,
     typeResolvers: {},
   });
-  const openApiSchema = await convert(jsonSchema);
+  const unpatchedOpenApiSchema = await convert(jsonSchema);
+  const openApiSchema = collection.model.patchSchema
+    ? collection.model.patchSchema(unpatchedOpenApiSchema)
+    : unpatchedOpenApiSchema;
 
   // @ts-expect-error
   Object.values(openApiSchema.items.properties ?? []).forEach(
@@ -134,16 +137,11 @@ export async function generateCollectionFiles(
     description:
       collection.model.description ??
       `Represents a ${capitalCase(collection.model.name)}`,
-    "x-examples": {
-      // random example
-      example:
-        data[
-          // @ts-expect-error
-          Object.keys(data)[
-            Math.floor(Math.random() * Object.keys(data).length)
-          ]
-        ],
-    },
+    example:
+      data[
+        // @ts-expect-error
+        Object.keys(data)[Math.floor(Math.random() * Object.keys(data).length)]
+      ],
   };
 
   schema.paths[`${collectionId}`] = {
@@ -151,11 +149,6 @@ export async function generateCollectionFiles(
       tags: collection.tags,
       description: `Get all ${capitalCase(collection.model.name)} IDs`,
       operationId: `getAll${pascalCase(collection.model.name)}Ids`,
-      examples: {
-        foo: {
-          value: [1, 2, 3],
-        },
-      },
       responses: {
         200: {
           description: `A list of all ${capitalCase(
@@ -167,6 +160,11 @@ export async function generateCollectionFiles(
                 type: "array",
                 items: {
                   type: idAttributeType,
+                },
+              },
+              examples: {
+                example: {
+                  value: allIds.slice(0, 10),
                 },
               },
             },
@@ -204,6 +202,13 @@ export async function generateCollectionFiles(
                   collection.model.name,
                 )}`,
               },
+              example:
+                data[
+                  // @ts-expect-error
+                  Object.keys(data)[
+                    Math.floor(Math.random() * Object.keys(data).length)
+                  ]
+                ],
             },
           },
         },

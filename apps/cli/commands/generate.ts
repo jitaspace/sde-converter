@@ -29,7 +29,7 @@ export default createCommand("generate")
       info: {
         title: "EVE Static Data Export",
         description: "An OpenAPI for the SDE",
-        version: "0.1",
+        version: "21.03.2",
         contact: {
           name: "Joao Neto",
           url: "https://www.jita.space/contact",
