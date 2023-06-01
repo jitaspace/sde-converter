@@ -1,6 +1,6 @@
 {
   "name": "@jitaspace/sde-converter",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "EVE SDE Converter to JSON",
   "main": "dist/index.cjs",
   "bin": "dist/index.cjs",

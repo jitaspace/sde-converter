@@ -38,7 +38,6 @@ export type SdeCollection = {
 };
 
 export const collections: Record<string, SdeCollection> = {
-  /*
   "/inventory/flags": {
     datasource: {
       type: "sde",
@@ -170,7 +169,7 @@ export const collections: Record<string, SdeCollection> = {
       name: "Category",
     },
     tags: ["Universe"],
-  },*/
+  },
   "/universe/certificates": {
     datasource: {
       type: "sde",
@@ -280,7 +279,7 @@ export const collections: Record<string, SdeCollection> = {
       type: "sde",
       name: "fsd/dogmaAttributeCategories.yaml",
     },
-    idAttribute: "attributeID",
+    idAttribute: "attributeCategoryID",
     model: {
       name: "DogmaAttributeCategory",
     },

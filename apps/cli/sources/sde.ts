@@ -107,7 +107,7 @@ export const sdeInputFiles: Record<string, SdeSourceFile> = {
     transformations: [addIdToItem],
   },
   "fsd/dogmaAttributeCategories.yaml": {
-    idAttributeName: "attributeID",
+    idAttributeName: "attributeCategoryID",
     idAttributeType: "number",
     transformations: [addIdToItem],
   },
