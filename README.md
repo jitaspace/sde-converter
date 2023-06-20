@@ -42,3 +42,30 @@ Serves the converted SDE using a local HTTP server.
 #### Options
 
 - `--port <port>`: Port to use for the HTTP server. Defaults to `8080`.
+
+## Useful commands (for myself)
+
+### Generate list of changed files between two directories
+
+`rclone` needs a list of files in the following format:
+```
+user1/42
+user1/dir/ford
+user2/prefect
+```
+
+Note the lack of `./` prefix.
+
+We can generate these with the following command from the 
+
+```bash
+diff -qrN <path/to/new/sde/root> <path/to/old/sde/root> | cut -d' ' -f2 | cut -c 3- > diff_files.txt
+```
+
+### Copy changed files 
+
+We can run the following from the same directory as the above command.
+
+```bash
+rclone copy -P --dry-run --files-from diff_files.txt . sde.jita.space:/jitaspace-sde/
+```
