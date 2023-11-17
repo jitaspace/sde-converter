@@ -69,3 +69,17 @@ We can run the following from the same directory as the above command.
 ```bash
 rclone copy -P --dry-run --files-from diff_files.txt . sde.jita.space:/jitaspace-sde/
 ```
+
+### Sync with Backblaze remote
+
+Using rclone, if we have the Backblaze B2 remote configured as "backblaze" and the bucket is named "jitaspace-sde", the following command synchronizes them:
+
+Note on the parameters:
+- `--fast-list` uses a lot more RAM, but minimizes the use of Class C Transactions. Now we can sync for free instead of paying 10$.
+- `--checksum` ignores timestamps, instead copying only files whose contents have changed.
+
+This makes it so we do not need the previous commands to avoid paying and waiting a lot.
+
+```bash
+rclone sync -P --fast-list --checksum --checkers=80 --transfers=80 ./bundled backblaze:/jitaspace-sde/bundled
+```
