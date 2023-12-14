@@ -467,7 +467,7 @@ export const collections: Record<string, SdeCollection> = {
         return schema;
       },
     },
-    tags: ["Planetary_Interaction"],
+    tags: ["Planetary Interaction"],
   },
   "/universe/races": {
     datasource: {

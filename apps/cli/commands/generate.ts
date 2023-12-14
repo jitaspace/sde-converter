@@ -79,6 +79,7 @@ export default createCommand("generate")
         generationDate: new Date().toISOString(),
       }),
     );
+    schema.tags.push({ name: "meta" });
     // @ts-expect-error
     schema.paths["/meta/version"] = {
       get: {
@@ -123,12 +124,16 @@ export default createCommand("generate")
     // Sort the schemas alphabetically
     const sortedSchemas = {};
     const sortedSchemaKeys = Object.keys(schema.components.schemas).sort();
-
     sortedSchemaKeys.forEach(
       // @ts-expect-error
       (key) => (sortedSchemas[key] = schema.components.schemas[key]),
     );
     schema.components.schemas = sortedSchemas;
+
+    // Sort the tags alphabetically, removing duplicates
+    schema.tags = [
+      ...new Set(schema.tags.sort((a, b) => a.name.localeCompare(b.name))),
+    ];
 
     // write the schema file
     await fs.promises.writeFile(
