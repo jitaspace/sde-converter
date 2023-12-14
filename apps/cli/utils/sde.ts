@@ -11,6 +11,16 @@ import { globalProgress } from "../lib/progress.js";
 import { downloadFile } from "./download.js";
 import { mkdir, sdeFolderChecksum, sdeZipChecksum, unzipSde } from "./fs.js";
 
+export async function latestSdeLastModified() {
+  const res = await fetch(SDE_DOWNLOAD_URL, {
+    method: "HEAD",
+  });
+  const lastModifiedHeader = res.headers.get("last-modified");
+  if (!lastModifiedHeader)
+    throw new Error("Unable to get SDE Last Modified date");
+  return new Date(lastModifiedHeader);
+}
+
 export async function ensureSdePresentAndExtracted() {
   // download latest checksum
   const checksumResponse = await fetch(SDE_CHECKSUM_URL);
