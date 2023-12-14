@@ -137,11 +137,13 @@ export async function generateCollectionFiles(
     description:
       collection.model.description ??
       `Represents a ${capitalCase(collection.model.name)}`,
+    /*
     example:
       data[
         // @ts-expect-error
         Object.keys(data)[Math.floor(Math.random() * Object.keys(data).length)]
       ],
+    */
   };
 
   schema.paths[`${collectionId}`] = {
@@ -162,11 +164,13 @@ export async function generateCollectionFiles(
                   type: idAttributeType,
                 },
               },
+              /*
               examples: {
                 example: {
                   value: allIds.slice(0, 10),
                 },
               },
+              */
             },
           },
         },
@@ -202,6 +206,7 @@ export async function generateCollectionFiles(
                   collection.model.name,
                 )}`,
               },
+              /*
               example:
                 data[
                   // @ts-expect-error
@@ -209,6 +214,7 @@ export async function generateCollectionFiles(
                     Math.floor(Math.random() * Object.keys(data).length)
                   ]
                 ],
+              */
             },
           },
         },
