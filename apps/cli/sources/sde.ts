@@ -244,7 +244,7 @@ export function fromArrayOfObjectsToMap(
     if (map.hasOwnProperty(item[idAttributeName])) {
       // FIXME: Downgraded to error due to existence of ID Collisions
       //throw new Error(`⚠️ Duplicate ID ${item[idAttributeName]}`);
-      globalProgress.log(`⚠️ Duplicate ID ${item[idAttributeName]}`);
+      globalProgress.log(`⚠️ Duplicate ID ${item[idAttributeName]}\n`);
       //console.error(`⚠️ Duplicate ID ${item[idAttributeName]}`);
     }
     map[item[idAttributeName]] = item;
