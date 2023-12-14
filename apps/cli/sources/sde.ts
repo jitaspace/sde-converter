@@ -2,6 +2,8 @@ import fs from "fs";
 import path from "path";
 import * as YAML from "js-yaml";
 
+import { globalProgress } from "../lib/progress";
+
 /**
  * Information about the structure of the SDE files.
  */
@@ -240,7 +242,10 @@ export function fromArrayOfObjectsToMap(
       throw new Error(`⚠️ Missing ID ${idAttributeName}`);
     }
     if (map.hasOwnProperty(item[idAttributeName])) {
-      throw new Error(`⚠️ Duplicate ID ${item[idAttributeName]}`);
+      // FIXME: Downgraded to error due to existence of ID Collisions
+      //throw new Error(`⚠️ Duplicate ID ${item[idAttributeName]}`);
+      globalProgress.log(`⚠️ Duplicate ID ${item[idAttributeName]}`);
+      //console.error(`⚠️ Duplicate ID ${item[idAttributeName]}`);
     }
     map[item[idAttributeName]] = item;
     return map[item[idAttributeName]];
