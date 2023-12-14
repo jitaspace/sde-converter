@@ -71,7 +71,7 @@ export default createCommand("generate")
     const METADATA_VERSION_PATH = "/meta";
     const metaPath = path.join(getWorkingDirectory(), "latest", "meta");
     mkdir(metaPath);
-    const metaVersionPath = path.join(metaPath, "version");
+    const metaVersionPath = path.join(metaPath, "version.json");
     fs.writeFileSync(
       metaVersionPath,
       JSON.stringify({
