@@ -79,11 +79,11 @@ export default createCommand("generate")
         generationDate: new Date().toISOString(),
       }),
     );
-    schema.tags.push({ name: "meta" });
+    schema.tags.push({ name: "Meta" });
     // @ts-expect-error
     schema.paths["/meta/version"] = {
       get: {
-        tags: ["meta"],
+        tags: ["Meta"],
         description: "Get API Version",
         operationId: "getVersion",
         responses: {
