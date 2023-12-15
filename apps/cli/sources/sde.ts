@@ -266,6 +266,18 @@ export function addIdToItem(
   return obj;
 }
 
+// If the keys of the object do not match those of the ID attribute, this will fix it!
+export function fixObjectIndices(
+  obj: Record<any, any>,
+  { idAttributeName }: { idAttributeName: string },
+) {
+  const result: typeof obj = {};
+  Object.values(obj).forEach(
+    (entry) => (result[entry[idAttributeName]] = entry),
+  );
+  return result;
+}
+
 export function loadFile(
   filename: keyof typeof sdeInputFiles,
   sdeRoot: string,
