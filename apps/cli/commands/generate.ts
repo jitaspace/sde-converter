@@ -131,9 +131,9 @@ export default createCommand("generate")
     schema.components.schemas = sortedSchemas;
 
     // Sort the tags alphabetically, removing duplicates
-    schema.tags = [
-      ...new Set(schema.tags.sort((a, b) => a.name.localeCompare(b.name))),
-    ];
+    schema.tags = [...new Set(schema.tags.map((tag) => tag.name).sort())].map(
+      (name) => ({ name }),
+    );
 
     // write the schema file
     await fs.promises.writeFile(
