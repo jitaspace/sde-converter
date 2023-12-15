@@ -66,7 +66,7 @@ export async function generateCollectionFiles(
   const bundlesPath = path.join(
     getWorkingDirectory(),
     "bundled",
-    ...collectionId.split("/"),
+    ...collectionId.split("/").slice(0, -1),
   );
   const indexPath = path.join(
     getWorkingDirectory(),
