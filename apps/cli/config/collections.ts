@@ -955,7 +955,7 @@ export const collections: Record<string, SdeCollection> = {
     },
     idAttribute: "schoolID",
     model: {
-      name: "School",
+      name: "SchoolMap",
     },
     tags: ["Universe"],
   },
