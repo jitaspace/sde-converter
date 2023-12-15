@@ -7,11 +7,15 @@
  */
 import { OpenAPIV3 } from "openapi-types";
 
-import { sdeInputFiles } from "../sources/sde.js";
+import {
+  SdeSourceFile,
+  fixObjectIndices,
+  sdeInputFiles,
+} from "../sources/sde.js";
 import { SdeUniverseSource } from "../sources/sde_universe.js";
 
 export type SdeCollection = {
-  datasource:
+  datasource: (
     | {
         type: "sde";
         name: keyof typeof sdeInputFiles;
@@ -27,7 +31,10 @@ export type SdeCollection = {
     | {
         type: "custom";
         generator: () => Promise<Record<string, any>>;
-      };
+      }
+  ) & {
+    transformations?: ((data: any, file: { idAttributeName: string }) => any)[];
+  };
   idAttribute: string;
   model: {
     name: string;
@@ -157,7 +164,7 @@ export const collections: Record<string, SdeCollection> = {
     model: {
       name: "Blueprint",
     },
-    tags: ["Universe"],
+    tags: ["Industry"],
   },
   "/universe/categories": {
     datasource: {
@@ -509,7 +516,7 @@ export const collections: Record<string, SdeCollection> = {
     model: {
       name: "SkinLicense",
     },
-    tags: ["Universe"],
+    tags: ["Skins"],
   },
   "/universe/skinMaterials": {
     datasource: {
@@ -520,7 +527,7 @@ export const collections: Record<string, SdeCollection> = {
     model: {
       name: "SkinMaterial",
     },
-    tags: ["Universe"],
+    tags: ["Skins"],
   },
   "/universe/stationOperations": {
     datasource: {
@@ -553,7 +560,7 @@ export const collections: Record<string, SdeCollection> = {
     model: {
       name: "TournamentRuleSet",
     },
-    tags: ["Universe"],
+    tags: ["Tournament"],
   },
   "/universe/translationLanguages": {
     datasource: {
@@ -564,7 +571,7 @@ export const collections: Record<string, SdeCollection> = {
     model: {
       name: "TranslationLanguage",
     },
-    tags: ["Universe"],
+    tags: ["Meta"],
   },
   "/dogma/types": {
     datasource: {
@@ -637,7 +644,7 @@ export const collections: Record<string, SdeCollection> = {
     model: {
       name: "TypeMaterial",
     },
-    tags: ["Universe"],
+    tags: ["Industry"],
   },
   "/universe/asteroidBelts": {
     datasource: {
@@ -918,6 +925,51 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Universe"],
   },
+  "/universe/expertSystems": {
+    datasource: {
+      type: "hoboleaks",
+      filename: "expertsystems.json",
+    },
+    idAttribute: "expertSystemID",
+    model: {
+      name: "ExpertSystem",
+    },
+    tags: ["Universe"],
+  },
+  "/universe/schools": {
+    datasource: {
+      type: "hoboleaks",
+      filename: "schools.json",
+    },
+    idAttribute: "schoolID",
+    model: {
+      name: "School",
+    },
+    tags: ["Universe"],
+  },
+  "/universe/schoolMap": {
+    datasource: {
+      type: "hoboleaks",
+      filename: "schoolmap.json",
+      transformations: [fixObjectIndices],
+    },
+    idAttribute: "schoolID",
+    model: {
+      name: "School",
+    },
+    tags: ["Universe"],
+  },
+  "/characters/skillplans": {
+    datasource: {
+      type: "hoboleaks",
+      filename: "skillplans.json",
+    },
+    idAttribute: "skillPlanID",
+    model: {
+      name: "SkillPlan",
+    },
+    tags: ["Characters"],
+  },
   "/universe/skins": {
     datasource: {
       type: "hoboleaks",
@@ -927,7 +979,7 @@ export const collections: Record<string, SdeCollection> = {
     model: {
       name: "Skin",
     },
-    tags: ["Universe"],
+    tags: ["Skins"],
   },
   "/universe/skinMaterialNames": {
     datasource: {
@@ -938,7 +990,7 @@ export const collections: Record<string, SdeCollection> = {
     model: {
       name: "SkinMaterialName",
     },
-    tags: ["Universe"],
+    tags: ["Skins"],
   },
   "/universe/graphicMaterialSets": {
     datasource: {
@@ -1015,6 +1067,6 @@ export const collections: Record<string, SdeCollection> = {
     model: {
       name: "CompressibleType",
     },
-    tags: ["Universe"],
+    tags: ["Industry"],
   },
 };

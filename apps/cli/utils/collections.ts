@@ -40,7 +40,7 @@ export async function generateCollectionFiles(
   globalProgress.update();
 
   // Read file
-  const data = await (async () => {
+  let data = await (async () => {
     switch (collection.datasource.type) {
       case "sde":
         return loadFile(collection.datasource.name, sdeRoot);
@@ -54,6 +54,11 @@ export async function generateCollectionFiles(
         );
     }
   })();
+
+  for (const transformFn of collection.datasource.transformations ?? []) {
+    data = transformFn(data, { idAttributeName: collection.idAttribute });
+  }
+
   progress.setTotal(Object.keys(data).length);
   globalProgress.update();
 
