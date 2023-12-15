@@ -968,7 +968,7 @@ export const collections: Record<string, SdeCollection> = {
     model: {
       name: "SkillPlan",
     },
-    tags: ["Characters"],
+    tags: ["Character"],
   },
   "/universe/skins": {
     datasource: {
