@@ -5,11 +5,15 @@
  * - GET /collection/{id} — returns a single item from the collection
  * Pagination is not supported, as the collections are expected to be small and static.
  */
+import path from "node:path";
 import { OpenAPIV3 } from "openapi-types";
 
+import { SDE_PATH } from "../commands/generate";
+import { getWorkingDirectory } from "../lib/cli";
 import {
   SdeSourceFile,
   fixObjectIndices,
+  loadFile,
   sdeInputFiles,
 } from "../sources/sde.js";
 import { SdeUniverseSource } from "../sources/sde_universe.js";
@@ -1068,5 +1072,62 @@ export const collections: Record<string, SdeCollection> = {
       name: "CompressibleType",
     },
     tags: ["Industry"],
+  },
+  // Helpful index to know the variations of a given type
+  "/universe/typeVariations": {
+    datasource: {
+      type: "sde",
+      name: "fsd/typeIDs.yaml",
+      transformations: [
+        (data, { idAttributeName }) => {
+          // compute variations for each type
+          const variations: Record<number, number[]> = {};
+          Object.values(data)
+            // @ts-ignore
+            .filter((entry) => entry.variationParentTypeID !== undefined)
+            .forEach((entry) => {
+              // @ts-ignore
+              const parentTypeId = entry.variationParentTypeID;
+              if (variations[parentTypeId] == undefined)
+                variations[parentTypeId] = [parentTypeId];
+              // @ts-ignore
+              variations[parentTypeId].push(entry.typeID);
+            });
+          const result: Record<number, { variations: number[] }> = {};
+          // populate objects that have a variationParentTypeID
+          Object.values(data)
+            // @ts-ignore
+            .filter((entry) => entry.variationParentTypeID !== undefined)
+            .forEach((entry) => {
+              // @ts-ignore
+              if (entry.variationParentTypeID !== undefined) {
+                // @ts-ignore
+                result[entry.typeID] = {
+                  // @ts-ignore
+                  base: entry.variationParentTypeID,
+                  // @ts-ignore
+                  variations: variations[entry.variationParentTypeID],
+                };
+              }
+            });
+
+          Object.keys(variations).forEach(
+            (typeID) =>
+              // @ts-ignore
+              (result[typeID] = {
+                base: Number(typeID),
+                // @ts-ignore
+                variations: variations[typeID],
+              }),
+          );
+          return result;
+        },
+      ],
+    },
+    idAttribute: "typeID",
+    model: {
+      name: "TypeVariations",
+    },
+    tags: ["Universe"],
   },
 };
