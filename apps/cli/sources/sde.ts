@@ -78,7 +78,7 @@ export const sdeInputFiles: Record<string, SdeSourceFile> = {
     idAttributeType: "number",
     transformations: [],
   },
-  "fsd/categoryIDs.yaml": {
+  "fsd/categories.yaml": {
     idAttributeName: "categoryID",
     idAttributeType: "number",
     transformations: [addIdToItem],
@@ -133,7 +133,7 @@ export const sdeInputFiles: Record<string, SdeSourceFile> = {
     idAttributeType: "number",
     transformations: [addIdToItem],
   },
-  "fsd/groupIDs.yaml": {
+  "fsd/groups.yaml": {
     idAttributeName: "groupID",
     idAttributeType: "number",
     transformations: [addIdToItem],
@@ -143,7 +143,7 @@ export const sdeInputFiles: Record<string, SdeSourceFile> = {
     idAttributeType: "number",
     transformations: [addIdToItem],
   },
-  "fsd/landmarks/landmarks.staticdata": {
+  "universe/landmarks/landmarks.yaml": {
     idAttributeName: "landmarkID",
     idAttributeType: "number",
     transformations: [addIdToItem],
@@ -218,7 +218,7 @@ export const sdeInputFiles: Record<string, SdeSourceFile> = {
     idAttributeType: "number",
     transformations: [addIdToItem],
   },
-  "fsd/typeIDs.yaml": {
+  "fsd/types.yaml": {
     idAttributeName: "typeID",
     idAttributeType: "number",
     transformations: [addIdToItem],

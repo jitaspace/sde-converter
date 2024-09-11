@@ -173,7 +173,7 @@ export const collections: Record<string, SdeCollection> = {
   "/universe/categories": {
     datasource: {
       type: "sde",
-      name: "fsd/categoryIDs.yaml",
+      name: "fsd/categories.yaml",
     },
     idAttribute: "categoryID",
     model: {
@@ -343,7 +343,7 @@ export const collections: Record<string, SdeCollection> = {
   "/universe/groups": {
     datasource: {
       type: "sde",
-      name: "fsd/groupIDs.yaml",
+      name: "fsd/groups.yaml",
     },
     idAttribute: "groupID",
     model: {
@@ -365,7 +365,7 @@ export const collections: Record<string, SdeCollection> = {
   "/universe/landmarks": {
     datasource: {
       type: "sde",
-      name: "fsd/landmarks/landmarks.staticdata",
+      name: "universe/landmarks/landmarks.yaml",
     },
     idAttribute: "landmarkID",
     model: {
@@ -591,7 +591,7 @@ export const collections: Record<string, SdeCollection> = {
   "/universe/types": {
     datasource: {
       type: "sde",
-      name: "fsd/typeIDs.yaml",
+      name: "fsd/types.yaml",
     },
     idAttribute: "typeID",
     model: {
@@ -1077,7 +1077,7 @@ export const collections: Record<string, SdeCollection> = {
   "/universe/typeVariations": {
     datasource: {
       type: "sde",
-      name: "fsd/typeIDs.yaml",
+      name: "fsd/types.yaml",
       transformations: [
         (data, { idAttributeName }) => {
           // compute variations for each type
