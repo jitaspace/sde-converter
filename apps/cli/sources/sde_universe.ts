@@ -7,7 +7,7 @@ import { TITLE_WIDTH, getWorkingDirectory } from "../lib/cli.js";
 import { globalProgress } from "../lib/progress.js";
 
 /**
- * This is a special file that parses and flattens the contents of the `fsd/universe` folder.
+ * This is a special file that parses and flattens the contents of the `universe` folder.
  */
 export const sdeUniverseSources = [
   "asteroidBelts",
@@ -44,9 +44,12 @@ export async function loadSdeUniverseSources() {
 
   const sdePath = path.resolve(getWorkingDirectory(), SDE_PATH);
 
-  const universeNames = fs.readdirSync(path.join(sdePath, "fsd", "universe"));
+  const universeNames = fs
+    .readdirSync(path.join(sdePath, "universe"))
+    .filter((name) => name !== "landmarks");
+
   for (const universeName of universeNames) {
-    const universePath = path.join(sdePath, "fsd", "universe", universeName);
+    const universePath = path.join(sdePath, "universe", universeName);
     const regionNames = fs.readdirSync(universePath);
     const universeProgress = globalProgress.create(regionNames.length, 0, {
       title: `Parsing ${universeName} regions`.padEnd(TITLE_WIDTH),
@@ -56,7 +59,7 @@ export async function loadSdeUniverseSources() {
       const regionPath = path.join(universePath, regionName);
 
       let region = YAML.load(
-        fs.readFileSync(path.join(regionPath, "region.staticdata"), "utf8"),
+        fs.readFileSync(path.join(regionPath, "region.yaml"), "utf8"),
       );
       // @ts-expect-error
       region.universeID = universeName;
@@ -65,13 +68,13 @@ export async function loadSdeUniverseSources() {
 
       const constellationNames = fs
         .readdirSync(regionPath)
-        .filter((file) => !file.endsWith(".staticdata"));
+        .filter((file) => !file.endsWith(".yaml"));
       for (const constellationName of constellationNames) {
         const constellationPath = path.join(regionPath, constellationName);
 
         let constellation = YAML.load(
           fs.readFileSync(
-            path.join(constellationPath, "constellation.staticdata"),
+            path.join(constellationPath, "constellation.yaml"),
             "utf8",
           ),
         );
@@ -84,13 +87,13 @@ export async function loadSdeUniverseSources() {
 
         const solarSystemNames = fs
           .readdirSync(constellationPath)
-          .filter((file) => !file.endsWith(".staticdata"));
+          .filter((file) => !file.endsWith(".yaml"));
         for (const solarSystemName of solarSystemNames) {
           const solarSystemPath = path.join(constellationPath, solarSystemName);
 
           let solarSystem = YAML.load(
             fs.readFileSync(
-              path.join(solarSystemPath, "solarsystem.staticdata"),
+              path.join(solarSystemPath, "solarsystem.yaml"),
               "utf8",
             ),
           );
