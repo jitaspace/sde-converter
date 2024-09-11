@@ -650,6 +650,28 @@ export const collections: Record<string, SdeCollection> = {
     },
     tags: ["Industry"],
   },
+  "/universe/planetResources": {
+    datasource: {
+      type: "sde",
+      name: "fsd/planetResources.yaml",
+    },
+    idAttribute: "planetID",
+    model: {
+      name: "PlanetResource",
+    },
+    tags: ["Universe"],
+  },
+  "/universe/sovereigntyUpgrades": {
+    datasource: {
+      type: "sde",
+      name: "fsd/sovereigntyUpgrades.yaml",
+    },
+    idAttribute: "typeID",
+    model: {
+      name: "SovereigntyUpgrade",
+    },
+    tags: ["Universe"],
+  },
   "/universe/asteroidBelts": {
     datasource: {
       type: "sde-universe",

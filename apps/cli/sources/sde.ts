@@ -228,6 +228,16 @@ export const sdeInputFiles: Record<string, SdeSourceFile> = {
     idAttributeType: "number",
     transformations: [addIdToItem],
   },
+  "fsd/planetResources.yaml": {
+    idAttributeName: "planetID",
+    idAttributeType: "number",
+    transformations: [addIdToItem],
+  },
+  "fsd/sovereigntyUpgrades.yaml": {
+    idAttributeName: "typeID",
+    idAttributeType: "number",
+    transformations: [addIdToItem],
+  },
 };
 
 // Converts an array of objects in the format [obj1, obj2, obj3] to {[obj1.id]: obj1, [obj2.id]: obj2, [obj3.id]: obj3}
