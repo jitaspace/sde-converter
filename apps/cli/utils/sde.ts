@@ -87,6 +87,6 @@ export async function ensureSdePresentAndExtracted() {
   mkdir(path.resolve(getWorkingDirectory(), "sde"));
   await unzipSde(
     path.resolve(getWorkingDirectory(), "sde.zip"),
-    getWorkingDirectory(),
+    path.resolve(getWorkingDirectory(), "sde"),
   );
 }
